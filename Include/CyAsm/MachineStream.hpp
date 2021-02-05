@@ -496,6 +496,12 @@ namespace CyberAsm
 		[[nodiscard]]
 		auto Find(std::span<char8_t> sequence) const -> std::vector<char8_t>::const_iterator;
 
+		/// <summary>
+		/// Insert x86 assembler in form of an instruction and operand.
+		/// </summary>
+		/// <param name="instruction"></param>
+		/// <param name="ops"></param>
+		/// <returns></returns>
 		auto Asm(X86::Instruction instruction, const std::initializer_list<Operand>& ops) -> std::span<char8_t>;
 
 	protected:

@@ -41,4 +41,9 @@ namespace CyberAsm::X86
 		}, operand.Data());
 		return out.Size() - size;
 	}
+
+	auto FindInstruction(const X86::Instruction instruction, const std::initializer_list<Operand>& operands) -> std::optional<std::tuple<std::size_t, std::size_t>>
+	{
+		
+	}
 }

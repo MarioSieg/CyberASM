@@ -454,7 +454,7 @@ namespace CyberAsm
 	auto MachineStream::Asm(const X86::Instruction instruction, const std::initializer_list<Operand>& ops) -> std::span<char8_t>
 	{
 		const auto size = this->stream.size();
-		X86::Encode(instruction, ops, *this);
+		Encode(instruction, ops, *this);
 		const auto diff = this->stream.size() - size;
 		return std::span<char8_t>(this->stream.end() - diff, this->stream.end());
 	}

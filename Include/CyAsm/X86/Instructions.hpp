@@ -71,8 +71,6 @@ namespace CyberAsm::X86
 		"aas",
 		"add",
 	};
-	
-	using Iot = InstructionOperandType;
 
 	constexpr std::array<std::initializer_list<InstructionVariation>, static_cast<std::size_t>(Instruction::Count)> InstructionTable
 	{

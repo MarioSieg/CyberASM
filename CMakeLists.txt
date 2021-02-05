@@ -16,7 +16,7 @@ add_library("libcyberasm" STATIC
 	"Include/CyAsm/X86/Size.hpp" 
 	"Include/CyAsm/StreamReader.hpp" 
 	"Include/CyAsm/X86/Instructions.hpp" 
-	"Include/CyAsm/X86/OperandType.hpp" 
+	 
 	"Include/CyAsm/MachineLanguage.hpp" 
 	"Include/CyAsm/MachineStream.hpp" 
 	"Source/MachineStream.cpp"     

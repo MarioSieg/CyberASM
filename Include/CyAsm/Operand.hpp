@@ -209,7 +209,7 @@ namespace CyberAsm
 	{
 		return std::holds_alternative<X86::Register>(this->data);
 	}
-
+	 
 	constexpr auto operator ""_imm8(const unsigned long long int value) noexcept -> Imm8
 	{
 		return Imm8
