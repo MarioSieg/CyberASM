@@ -1,5 +1,4 @@
 #include "../Include/CyAsm/MachineStream.hpp"
-#include "../Include/CyAsm/X86/Encoder.hpp"
 
 #include <fstream>
 #include <execution>
@@ -449,13 +448,5 @@ namespace CyberAsm
 	auto MachineStream::Find(const std::span<char8_t> sequence) const -> std::vector<char8_t>::const_iterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
-	}
-
-	auto MachineStream::Asm(const X86::Instruction instruction, const std::initializer_list<Operand>& ops) -> std::span<char8_t>
-	{
-		const auto size = this->stream.size();
-		Encode(instruction, ops, *this);
-		const auto diff = this->stream.size() - size;
-		return std::span<char8_t>(this->stream.end() - diff, this->stream.end());
 	}
 }

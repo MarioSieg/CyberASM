@@ -1,6 +1,8 @@
 #include <iostream>
 
 #include "../Include/CyAsm/MachineStream.hpp"
+#include "../Include/CyAsm/X86/Encoder.hpp"
+#include "../Include/CyAsm/X86/Operand.hpp"
 
 using namespace CyberAsm;
 
@@ -8,7 +10,12 @@ auto main(const int argc, const char* const* const argv) -> int
 {
 	std::cout << "Cyber Assembly\n----------------\n";
 	MachineStream out = {};
-	out.Asm(X86::Instruction::Add, {X86::Register::Al, 3_imm8, 4_imm16});
+
+	using namespace X86;
+
+	const Operand operands[] = {Operand(Register::Al), Operand(Imm8(3))};
+	Encode(out, Instruction::Adc, operands);
+
 	std::cout << out;
 
 	return 0;
