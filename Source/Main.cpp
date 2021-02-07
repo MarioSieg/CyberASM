@@ -13,8 +13,21 @@ auto main(const int argc, const char* const* const argv) -> int
 
 	using namespace X86;
 
-	const Operand operands[] = {Operand(Register::Al), Operand(Imm8(3))};
-	Encode(out, Instruction::Adc, operands);
+	const Operand operands[] = {Operand(Register::Rax), Register::Rdi};
+	const auto result = Encode(out, Instruction::Adc, operands);
+
+	if (result != EncoderResult::Ok) [[unlikely]]
+	{
+		if (result == EncoderResult::InvalidMachineCodeIndex)
+		{
+			std::cerr << "invalid machine code index!";
+		}
+		else if (result == EncoderResult::NoInstructionVariationFound)
+		{
+			std::cerr << "no instruction variation found!";
+		}
+		return -1;
+	}
 
 	std::cout << out;
 

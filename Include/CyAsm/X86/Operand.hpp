@@ -35,7 +35,7 @@ namespace CyberAsm
 			auto FlushBytes(MachineStream& out) const -> std::size_t;
 
 		private:
-			OperandData data = {{0}};
+			OperandData data = {Imm8{0x00}};
 			OperandFlags::Flags flags = OperandFlags::None;
 		};
 	}

@@ -1,6 +1,8 @@
 #include "../../Include/CyAsm/X86/Operand.hpp"
 #include "../../Include/CyAsm/MachineStream.hpp"
 
+#include <cassert>
+
 namespace CyberAsm::X86
 {
 	Operand::Operand(const Imm8 value) noexcept
@@ -49,6 +51,7 @@ namespace CyberAsm::X86
 		else
 		{
 			const auto size = RegisterSizeTable[static_cast<std::size_t>(value)];
+			assert(size && size <= 64);
 			switch (size)
 			{
 				case 1:

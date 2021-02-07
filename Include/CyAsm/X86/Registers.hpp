@@ -299,150 +299,150 @@ namespace CyberAsm::X86
 		4, // eflags
 		2, // flags
 
-		10,	// st0
-		10,	// st1
-		10,	// st2
-		10,	// st3
-		10,	// st4
-		10,	// st5
-		10,	// st6
-		10,	// st7
+		10, // st0
+		10, // st1
+		10, // st2
+		10, // st3
+		10, // st4
+		10, // st5
+		10, // st6
+		10, // st7
 
-		8,	// mm0
-		8,	// mm1
-		8,	// mm2
-		8,	// mm3
-		8,	// mm4
-		8,	// mm5
-		8,	// mm6
-		8,	// mm7
+		8, // mm0
+		8, // mm1
+		8, // mm2
+		8, // mm3
+		8, // mm4
+		8, // mm5
+		8, // mm6
+		8, // mm7
 
-		2,	// es
-		2,	// cs
-		2,	// ss
-		2,	// ds
-		2,	// fs
-		2,	//gs
+		2, // es
+		2, // cs
+		2, // ss
+		2, // ds
+		2, // fs
+		2, //gs
 
-		16,	// xmm0
-		16,	// xmm1
-		16,	// xmm2
-		16,	// xmm3
-		16,	// xmm4
-		16,	// xmm5
-		16,	// xmm6
-		16,	// xmm7
-		16,	// xmm8
-		16,	// xmm9
-		16,	// xmm10
-		16,	// xmm11
-		16,	// xmm12
-		16,	// xmm13
-		16,	// xmm14
-		16,	// xmm15
+		16, // xmm0
+		16, // xmm1
+		16, // xmm2
+		16, // xmm3
+		16, // xmm4
+		16, // xmm5
+		16, // xmm6
+		16, // xmm7
+		16, // xmm8
+		16, // xmm9
+		16, // xmm10
+		16, // xmm11
+		16, // xmm12
+		16, // xmm13
+		16, // xmm14
+		16, // xmm15
 
-		32,	// ymm0
-		32,	// ymm1
-		32,	// ymm2
-		32,	// ymm3
-		32,	// ymm4
-		32,	// ymm5
-		32,	// ymm6
-		32,	// ymm7
-		32,	// ymm8
-		32,	// ymm9
-		32,	// ymm10
-		32,	// ymm11
-		32,	// ymm12
-		32,	// ymm13
-		32,	// ymm14
-		32	// ymm15
+		32, // ymm0
+		32, // ymm1
+		32, // ymm2
+		32, // ymm3
+		32, // ymm4
+		32, // ymm5
+		32, // ymm6
+		32, // ymm7
+		32, // ymm8
+		32, // ymm9
+		32, // ymm10
+		32, // ymm11
+		32, // ymm12
+		32, // ymm13
+		32, // ymm14
+		32 // ymm15
 	};
 
 	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterIdTable =
 	{
-		0x0,	// rax
-		0x0,	// eax
-		0x0,	// ax
-		0x0,	// ah
-		0x0,	// al
+		0x0, // rax
+		0x0, // eax
+		0x0, // ax
+		0x0, // ah
+		0x0, // al
 
-		0x3,	// rbx
-		0x3,	// ebx
-		0x3,	// bx
-		0x3,	// bh
-		0x3,	// bl
+		0x3, // rbx
+		0x3, // ebx
+		0x3, // bx
+		0x3, // bh
+		0x3, // bl
 
-		0x1,	// rcx
-		0x1,	// ecx
-		0x1,	// cx
-		0x1,	// ch
-		0x1,	// cl
+		0x1, // rcx
+		0x1, // ecx
+		0x1, // cx
+		0x1, // ch
+		0x1, // cl
 
-		0x2,	// rdx
-		0x2,	// edx
-		0x2,	// dx
-		0x2,	// dh
-		0x2,	// dl
+		0x2, // rdx
+		0x2, // edx
+		0x2, // dx
+		0x2, // dh
+		0x2, // dl
 
-		0x6,	// rsi
-		0x6,	// esi
-		0x6,	// si
-		0x6,	// sil
+		0x6, // rsi
+		0x6, // esi
+		0x6, // si
+		0x6, // sil
 
-		0x7,	// rdi
-		0x7,	// edi
-		0x7,	// di
-		0x7,	// dil
+		0x7, // rdi
+		0x7, // edi
+		0x7, // di
+		0x7, // dil
 
-		0x15,	// rip
-		0x15,	// eip
-		0x15,	// ip
+		0x15, // rip
+		0x15, // eip
+		0x15, // ip
 
-		0x0,	// rflags
-		0x0,	// eflags
-		0x0,	// flags
+		0x0, // rflags
+		0x0, // eflags
+		0x0, // flags
 
-		0x30,	// st0
-		0x31,	// st1
-		0x32,	// st2
-		0x33,	// st3
-		0x34,	// st4
-		0x35,	// st5
-		0x36,	// st6
-		0x37,	// st7
+		0x30, // st0
+		0x31, // st1
+		0x32, // st2
+		0x33, // st3
+		0x34, // st4
+		0x35, // st5
+		0x36, // st6
+		0x37, // st7
 
-		0x40,	// mm0
-		0x41,	// mm1
-		0x42,	// mm2
-		0x43,	// mm3
-		0x44,	// mm4
-		0x45,	// mm5
-		0x46,	// mm6
-		0x47,	// mm7
+		0x40, // mm0
+		0x41, // mm1
+		0x42, // mm2
+		0x43, // mm3
+		0x44, // mm4
+		0x45, // mm5
+		0x46, // mm6
+		0x47, // mm7
 
-		0x60,	// es
-		0x61,	// cs
-		0x62,	// ss
-		0x63,	// ds
-		0x64,	// fs
-		0x65,	// gs
+		0x60, // es
+		0x61, // cs
+		0x62, // ss
+		0x63, // ds
+		0x64, // fs
+		0x65, // gs
 
-		0x50,	// xmm0
-		0x51,	// xmm1
-		0x52,	// xmm2
-		0x53,	// xmm3
-		0x54,	// xmm4
-		0x55,	// xmm5
-		0x56,	// xmm6
-		0x57,	// xmm7
-		0x58,	// xmm8
-		0x59,	// xmm9
-		0x5A,	// xmm10
-		0x5B,	// xmm11
-		0x5C,	// xmm12
-		0x5D,	// xmm13
-		0x5E,	// xmm14
-		0x5F,	// xmm15
+		0x50, // xmm0
+		0x51, // xmm1
+		0x52, // xmm2
+		0x53, // xmm3
+		0x54, // xmm4
+		0x55, // xmm5
+		0x56, // xmm6
+		0x57, // xmm7
+		0x58, // xmm8
+		0x59, // xmm9
+		0x5A, // xmm10
+		0x5B, // xmm11
+		0x5C, // xmm12
+		0x5D, // xmm13
+		0x5E, // xmm14
+		0x5F, // xmm15
 	};
 }

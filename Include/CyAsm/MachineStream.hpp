@@ -28,13 +28,13 @@ namespace CyberAsm
 		explicit MachineStream(const char8_t* memory, std::size_t size);
 		explicit MachineStream(const std::byte* memory, std::size_t size);
 		explicit MachineStream(std::size_t capacity);
-		
+
 		MachineStream(const MachineStream&) = default;
 		MachineStream(MachineStream&&) noexcept = default;
-		
+
 		auto operator=(const MachineStream&) -> MachineStream& = default;
 		auto operator=(MachineStream&&) -> MachineStream& = default;
-		
+
 		virtual ~MachineStream() = default;
 
 		template <typename T> requires std::is_trivial_v<T>
@@ -81,7 +81,7 @@ namespace CyberAsm
 		auto operator <<(const std::vector<std::byte>& x) -> MachineStream&;
 		auto operator <<(std::initializer_list<char8_t>&& x) -> MachineStream&;
 		auto operator <<(const void* x) -> MachineStream&;
-		
+
 		auto operator [](std::size_t idx) -> char8_t&;
 		auto operator [](std::size_t idx) const -> char8_t;
 		auto operator *() -> char8_t&;

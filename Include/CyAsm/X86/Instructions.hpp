@@ -21,9 +21,9 @@ namespace CyberAsm::X86
 		std::initializer_list<std::initializer_list<OperandFlags::Flags>>
 		{
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Reg8},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Reg16 | OperandFlags::Reg32 | OperandFlags::Reg64},
+			{OperandFlags::RegMem_16_32_64, OperandFlags::Reg_16_32_64},
 			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
-			{OperandFlags::Reg16 | OperandFlags::Reg32 | OperandFlags::Reg64, OperandFlags::RegMem_16_32_64},
+			{OperandFlags::Reg_16_32_64, OperandFlags::RegMem_16_32_64},
 			{OperandFlags::Reg8Al, OperandFlags::Imm8},
 			{OperandFlags::Reg64Rax, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},

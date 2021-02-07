@@ -9,14 +9,20 @@ namespace CyberAsm
 	concept ValidOperand = requires
 	{
 		std::is_trivial_v<T>;
+		std::is_integral_v<T>;
 		sizeof(T) <= 8;
 	};
 
 	template <typename T> requires ValidOperand<T>
 	struct Imm final
 	{
-		constexpr Imm(const T value) noexcept;
-		
+		explicit constexpr Imm(T value) noexcept;
+		constexpr Imm(const Imm&) noexcept = default;
+		constexpr Imm(Imm&&) noexcept = default;
+		constexpr auto operator =(const Imm&) noexcept -> Imm& = default;
+		constexpr auto operator =(Imm&&) noexcept -> Imm& = default;
+		~Imm() = default;
+
 		T Value;
 	};
 
