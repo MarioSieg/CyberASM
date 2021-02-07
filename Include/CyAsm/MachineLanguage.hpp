@@ -1,6 +1,6 @@
 #pragma once
 
-#include "x86/Instructions.hpp"
+#include "X86/Instructions.hpp"
 
 #include <array>
 #include <algorithm>

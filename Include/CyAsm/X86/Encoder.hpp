@@ -23,9 +23,10 @@ namespace CyberAsm
 
 		[[nodiscard]]
 		extern auto Encode(MachineStream& out, Instruction instruction, std::span<const Operand> operands) -> EncoderResult;
-		;
-		extern auto WriteOperands(MachineStream& out, std::span<const Operand> operands) -> std::size_t;
 
+        extern void WriteOperands(MachineStream& out, std::span<const Operand> operands);
+
+        [[nodiscard]]
 		extern auto DetermineInstructionVariation(Instruction instruction, std::span<const Operand> operands) -> std::optional<std::size_t>;
 	}
 }
