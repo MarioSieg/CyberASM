@@ -25,208 +25,214 @@ namespace CyberAsm
 		stream.reserve(capacity);
 	}
 
-	auto MachineStream::operator<<(const std::byte x) -> MachineStream&
+	auto MachineStream::operator<<(const std::byte value) -> MachineStream&
 	{
-		this->stream.push_back(static_cast<char8_t>(x));
+		this->stream.push_back(static_cast<char8_t>(value));
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::uint8_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::uint8_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::int8_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::int8_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::uint16_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::uint16_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::int16_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::int16_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::uint32_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::uint32_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::int32_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::int32_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::uint64_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::uint64_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::int64_t x) -> MachineStream&
+	auto MachineStream::operator<<(const std::int64_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const float x) -> MachineStream&
+	auto MachineStream::operator<<(const float value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const double x) -> MachineStream&
+	auto MachineStream::operator<<(const double value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char x) -> MachineStream&
+	auto MachineStream::operator<<(const long double value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const wchar_t x) -> MachineStream&
+	auto MachineStream::operator<<(const char value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char8_t x) -> MachineStream&
+	auto MachineStream::operator<<(const wchar_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char16_t x) -> MachineStream&
+	auto MachineStream::operator<<(const char8_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char32_t x) -> MachineStream&
+	auto MachineStream::operator<<(const char16_t value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->Insert(value);
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char* x) -> MachineStream&
+	auto MachineStream::operator<<(const char32_t value) -> MachineStream&
 	{
-		while (*x) [[likely]]
+		this->Insert(value);
+		return *this;
+	}
+
+	auto MachineStream::operator<<(const char* value) -> MachineStream&
+	{
+		while (*value) [[likely]]
 		{
-			*this << *x++;
+			*this << *value++;
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const wchar_t* x) -> MachineStream&
+	auto MachineStream::operator<<(const wchar_t* value) -> MachineStream&
 	{
-		while (*x) [[likely]]
+		while (*value) [[likely]]
 		{
-			*this << *x++;
+			*this << *value++;
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char8_t* x) -> MachineStream&
+	auto MachineStream::operator<<(const char8_t* value) -> MachineStream&
 	{
-		while (*x) [[likely]]
+		while (*value) [[likely]]
 		{
-			*this << *x++;
+			*this << *value++;
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char16_t* x) -> MachineStream&
+	auto MachineStream::operator<<(const char16_t* value) -> MachineStream&
 	{
-		while (*x) [[likely]]
+		while (*value) [[likely]]
 		{
-			*this << *x++;
+			*this << *value++;
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char32_t* x) -> MachineStream&
+	auto MachineStream::operator<<(const char32_t* value) -> MachineStream&
 	{
-		while (*x) [[likely]]
+		while (*value) [[likely]]
 		{
-			*this << *x++;
+			*this << *value++;
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::string& x) -> MachineStream&
+	auto MachineStream::operator<<(const std::string& value) -> MachineStream&
 	{
-		this->stream.insert(this->stream.end(), x.begin(), x.end());
+		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::string_view x) -> MachineStream&
+	auto MachineStream::operator<<(const std::string_view value) -> MachineStream&
 	{
-		this->stream.reserve(this->stream.size() + x.size());
-		this->stream.insert(this->stream.end(), x.begin(), x.end());
+		this->stream.reserve(this->stream.size() + value.size());
+		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::u8string_view x) -> MachineStream&
+	auto MachineStream::operator<<(const std::u8string_view value) -> MachineStream&
 	{
-		this->stream.insert(this->stream.end(), x.begin(), x.end());
+		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::span<char8_t> x) -> MachineStream&
+	auto MachineStream::operator<<(const std::span<char8_t> value) -> MachineStream&
 	{
-		this->stream.reserve(this->stream.size() + x.size());
-		this->stream.insert(this->stream.end(), x.begin(), x.end());
+		this->stream.reserve(this->stream.size() + value.size());
+		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	auto MachineStream::operator<<(std::span<std::byte> x) -> MachineStream&
+	auto MachineStream::operator<<(std::span<std::byte> value) -> MachineStream&
 	{
-		this->stream.reserve(this->stream.size() + x.size());
-		for (const auto value : x)
-		{
-			this->stream.push_back(static_cast<char8_t>(value));
-		}
-		return *this;
-	}
-
-	auto MachineStream::operator<<(const std::vector<char8_t>& x) -> MachineStream&
-	{
-		this->stream.insert(this->stream.end(), x.begin(), x.end());
-		return *this;
-	}
-
-	auto MachineStream::operator<<(const std::vector<std::byte>& x) -> MachineStream&
-	{
-		this->stream.reserve(this->stream.size() + x.size());
-		for (const auto value : x)
+		this->stream.reserve(this->stream.size() + value.size());
+		for (const auto value : value)
 		{
 			this->stream.push_back(static_cast<char8_t>(value));
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(std::initializer_list<char8_t>&& x) -> MachineStream&
+	auto MachineStream::operator<<(const std::vector<char8_t>& value) -> MachineStream&
 	{
-		this->stream.insert(this->stream.end(), x.begin(), x.end());
+		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const void* const x) -> MachineStream&
+	auto MachineStream::operator<<(const std::vector<std::byte>& value) -> MachineStream&
 	{
-		this->Insert(x);
+		this->stream.reserve(this->stream.size() + value.size());
+		for (const auto value : value)
+		{
+			this->stream.push_back(static_cast<char8_t>(value));
+		}
+		return *this;
+	}
+
+	auto MachineStream::operator<<(std::initializer_list<char8_t>&& value) -> MachineStream&
+	{
+		this->stream.insert(this->stream.end(), value.begin(), value.end());
+		return *this;
+	}
+
+	auto MachineStream::operator<<(const void* const value) -> MachineStream&
+	{
+		this->Insert(value);
 		return *this;
 	}
 
@@ -347,24 +353,24 @@ namespace CyberAsm
 		return this->stream.end();
 	}
 
-	auto MachineStream::rbegin() const noexcept -> std::vector<char8_t>::const_iterator
+	auto MachineStream::rbegin() const noexcept -> std::vector<char8_t>::const_reverse_iterator
 	{
-		return this->rbegin();
+		return this->stream.rbegin();
 	}
 
-	auto MachineStream::rend() const noexcept -> std::vector<char8_t>::const_iterator
+	auto MachineStream::rend() const noexcept -> std::vector<char8_t>::const_reverse_iterator
 	{
-		return this->rend();
+		return this->stream.rend();
 	}
 
-	auto MachineStream::rbegin() noexcept -> std::vector<char8_t>::iterator
+	auto MachineStream::rbegin() noexcept -> std::vector<char8_t>::reverse_iterator
 	{
-		return this->rbegin();
+		return this->stream.rbegin();
 	}
 
-	auto MachineStream::rend() noexcept -> std::vector<char8_t>::iterator
+	auto MachineStream::rend() noexcept -> std::vector<char8_t>::reverse_iterator
 	{
-		return this->rend();
+		return this->stream.rend();
 	}
 
 	auto MachineStream::Insert(const void* const mem, const std::size_t size) -> std::vector<char8_t>&

@@ -5,6 +5,14 @@
 
 namespace CyberAsm::X86
 {
+	enum class Size : std::uint8_t
+	{
+		B1 = 1,
+		B2 = 2,
+		B4 = 4,
+		B8 = 8
+	};
+
 	struct OperandFlags final
 	{
 		enum Enum : std::uint32_t
@@ -42,6 +50,7 @@ namespace CyberAsm::X86
 		static constexpr auto IsExplicitRegister(Flags flags) noexcept -> bool;
 		static constexpr auto IsImmediate(Flags flags) noexcept -> bool;
 		static constexpr auto IsMemory(Flags flags) noexcept -> bool;
+		static constexpr auto OperandByteSize(Flags flags) noexcept -> Size;
 	};
 
 	constexpr auto OperandFlags::IsRegister(const Flags flags) noexcept -> bool
@@ -62,5 +71,22 @@ namespace CyberAsm::X86
 	constexpr auto OperandFlags::IsMemory(const Flags flags) noexcept -> bool
 	{
 		return flags >= Mem8 && flags <= Mem64;
+	}
+
+	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> Size
+	{
+		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64 || flags & Imm64) [[likely]]
+		{
+			return Size::B8;
+		}
+		if (flags == Reg32Eax || flags & Reg32 || flags & Mem32 || flags & Imm32) [[likely]]
+		{
+			return Size::B4;
+		}
+		if (flags == Reg16Ax || flags & Reg16 || flags & Mem16 || flags & Imm16) [[unlikely]]
+		{
+			return Size::B2;
+		}
+		return Size::B1;
 	}
 }

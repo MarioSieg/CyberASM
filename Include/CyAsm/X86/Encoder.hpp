@@ -1,8 +1,6 @@
 #pragma once
 
-#include <string_view>
 #include <cstdint>
-#include <optional>
 #include <span>
 
 namespace CyberAsm
@@ -14,19 +12,11 @@ namespace CyberAsm
 		class Operand;
 		enum class Instruction : std::uint8_t;
 
-		enum class EncoderResult
-		{
-			Ok = 0,
-			NoInstructionVariationFound,
-			InvalidMachineCodeIndex
-		};
+		extern void Encode(MachineStream& out, Instruction instruction, std::span<const Operand> operands);
+
+		extern void WriteOperands(MachineStream& out, std::span<const Operand> operands);
 
 		[[nodiscard]]
-		extern auto Encode(MachineStream& out, Instruction instruction, std::span<const Operand> operands) -> EncoderResult;
-
-        extern void WriteOperands(MachineStream& out, std::span<const Operand> operands);
-
-        [[nodiscard]]
-		extern auto DetermineInstructionVariation(Instruction instruction, std::span<const Operand> operands) -> std::optional<std::size_t>;
+		extern auto DetermineInstructionVariation(Instruction instruction, std::span<const Operand> operands) -> std::tuple<std::size_t, Size>;
 	}
 }

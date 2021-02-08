@@ -1,6 +1,7 @@
 #pragma once
 
 #include "OperandFlags.hpp"
+#include "Prefix.hpp"
 
 #include <cstdint>
 #include <string_view>
@@ -34,11 +35,11 @@ namespace CyberAsm::X86
 
 	constexpr std::array<std::initializer_list<std::u8string_view>, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{
-                // adc
-                std::initializer_list<std::u8string_view>
-                {
-                        u8"\x10", u8"\x11", u8"\x12", u8"\x13", u8"\x14", u8"\x15", u8"\x80", u8"\x81", u8"\x83"
-                }
+		// adc
+		std::initializer_list<std::u8string_view>
+		{
+			u8"\x10", u8"\x11", u8"\x12", u8"\x13", u8"\x14", u8"\x15", u8"\x80", u8"\x81", u8"\x83"
+		}
 	};
 
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
