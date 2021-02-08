@@ -26,7 +26,7 @@ namespace CyberAsm::X86
 
 		if (maxOpSize == Size::B8) [[likely]]
 		{
-			out << static_cast<char8_t>(PrefixType::Rex);
+			out << static_cast<char8_t>(PrefixType::RexW64);
 		}
 		else if (maxOpSize == Size::B4) [[likely]]
 		{

@@ -89,27 +89,20 @@ namespace CyberAsm
 		auto operator *() const -> char8_t;
 		auto operator ()(const std::filesystem::path& file) -> bool;
 
-
 		[[nodiscard]] auto Stream() const & noexcept -> const std::vector<char8_t>&;
 		[[nodiscard]] auto Stream() & noexcept -> std::vector<char8_t>&;
 		[[nodiscard]] auto Stream() && noexcept -> std::vector<char8_t>&&;
 
-
 		[[nodiscard]] auto CurrentEndianness() const noexcept -> Endianness;
 		[[nodiscard]] auto SwitchEndianness() -> Endianness;
-
 
 		void Reserve(std::size_t size);
 		void Clear();
 		void Resize(std::size_t size);
-
-
 		[[nodiscard]] auto Size() const noexcept -> std::size_t;
-
 
 		void InsertPadding(std::size_t byteSize, char8_t scalar = 0, std::size_t needle = 0);
 		void InsertPadding(std::size_t from, std::size_t to, char8_t scalar);
-
 
 		[[nodiscard]] auto Contains(char8_t target) const -> bool;
 		[[nodiscard]] auto Find(char8_t target) -> std::vector<char8_t>::iterator;
@@ -118,7 +111,7 @@ namespace CyberAsm
 		[[nodiscard]] auto Find(std::span<char8_t> sequence) -> std::vector<char8_t>::iterator;
 		[[nodiscard]] auto Find(std::span<char8_t> sequence) const -> std::vector<char8_t>::const_iterator;
 
-	protected:
+	private:
 		std::vector<char8_t> stream = {};
 		Endianness endianness = Endianness::Little;
 	};

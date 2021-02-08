@@ -13,7 +13,7 @@ auto main(const int argc, const char* const* const argv) -> int
 
 	using namespace X86;
 
-	const Operand operands[] = {Operand(Register::Rax), Register::Rdi};
+	const Operand operands[] = {Operand(Register::Al), Operand(Imm8(5))};
 
 	try
 	{
