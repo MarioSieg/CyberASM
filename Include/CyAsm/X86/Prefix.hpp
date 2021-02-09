@@ -2,12 +2,8 @@
 
 namespace CyberAsm::X86
 {
-	enum class PrefixType : char8_t
-	{
-		None = 0,
-		RexW64 = u8'\x48',
-		OperandOverride32 = u8'\x66',
-		AddressOverride = u8'\x67',
-		Lock = u8'\xF0'
-	};
+	constexpr std::uint8_t RexW64 = 0x48;
+	constexpr std::uint8_t OperandOverride32 = 0x66;
+	constexpr std::uint8_t AddressOverride = 0x67;
+	constexpr std::uint8_t Lock = 0xF;
 }

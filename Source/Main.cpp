@@ -13,11 +13,15 @@ auto main(const int argc, const char* const* const argv) -> int
 
 	using namespace X86;
 
-	const Operand operands[] = {Operand(Register::Al), Operand(Imm8(5))};
+	const Operand operands[] = {Operand(Register::Eax), Operand(Imm8(5))};
 
 	try
 	{
-		Encode(out, Instruction::Adc, operands);
+		const EncodedInstruction instr = Encode(Instruction::Adc, operands);
+		for(const auto byte : instr.Packed)
+		{
+			std::cout << std::hex << std::uppercase << static_cast<std::uint16_t>(byte) << ' ';
+		}
 	}
 	catch (const std::exception& ex)
 	{

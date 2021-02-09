@@ -33,13 +33,19 @@ namespace CyberAsm::X86
 		},
 	};
 
-	constexpr std::array<std::initializer_list<std::u8string_view>, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
+	constexpr std::array<std::initializer_list<std::uint8_t>, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{
 		// adc
-		std::initializer_list<std::u8string_view>
+		std::initializer_list<std::uint8_t>
 		{
-			u8"\x10", u8"\x11", u8"\x12", u8"\x13", u8"\x14", u8"\x15", u8"\x80", u8"\x81", u8"\x83"
+			0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x80, 0x81, 0x83
 		}
+	};
+
+	constexpr std::array<bool, static_cast<std::size_t>(Instruction::Count)> TwoByteOpcodeTable
+	{
+		// adc
+		false
 	};
 
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
@@ -61,4 +67,24 @@ namespace CyberAsm::X86
 
 	constexpr auto AreTablesValidated = ValidateTables();
 	static_assert(AreTablesValidated);
+
+	union EncodedInstruction
+	{
+		struct Fields final {
+			std::uint32_t Prefix : 8 = 0;
+			std::uint32_t OpCode : 24 = 0;
+			std::uint32_t Mod : 2 = 0;
+			std::uint32_t Reg : 3 = 0;
+			std::uint32_t Rm : 3 = 0;
+			std::uint32_t Scale : 2 = 0;
+			std::uint32_t Index : 3 = 0;
+			std::uint32_t Base : 3 = 0;
+			std::uint32_t Disp : 32 = 0;
+			std::uint32_t Imm : 32 = 0;
+		} Fields;
+		
+		std::array<std::uint8_t, sizeof(Fields)> Packed = {};
+	};
+
+	static_assert(sizeof(EncodedInstruction) == 16);
 }

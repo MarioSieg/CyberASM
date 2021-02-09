@@ -26,12 +26,12 @@ namespace CyberAsm
 	/// <param name="in"></param>
 	/// <returns></returns>
 	template <typename T, Endianness E = Endianness::Little> requires std::is_trivial_v<T>
-	constexpr void BytePack(std::array<char8_t, sizeof(T)>& out, const T& in)
+	constexpr void BytePack(std::array<std::uint8_t, sizeof(T)>& out, const T& in)
 	{
 		union
 		{
 			T Instance;
-			std::array<char8_t, sizeof(T)> Bytes;
+			std::array<std::uint8_t, sizeof(T)> Bytes;
 		} castor = {in};
 
 		if constexpr (sizeof(T) == 1)

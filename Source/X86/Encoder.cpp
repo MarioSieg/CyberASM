@@ -5,54 +5,26 @@
 
 namespace CyberAsm::X86
 {
-	void Encode(MachineStream& out, const Instruction instruction, std::span<const Operand> operands)
-	{
+	auto Encode(const Instruction instruction, const std::span<const Operand> operands) -> EncodedInstruction
+	{		
 		const auto instructionIndex = static_cast<std::size_t>(instruction);
-
-		// First get the instruction variation, which is determined by the operands:
-		const std::tuple<std::size_t, Size> variation = DetermineInstructionVariation(instruction, operands);
-
+		const std::tuple<std::size_t, FixedSize> variation = DetermineInstructionVariation(instruction, operands);
 		const std::size_t variationIndex = std::get<0>(variation);
-		const Size maxOpSize = std::get<1>(variation);
+		const FixedSize operandSize = std::get<1>(variation);
+		const std::initializer_list<std::uint8_t>& machineCodeList = MachineCodeTable[instructionIndex];
+		const bool twoByteOp = TwoByteOpcodeTable[instructionIndex];
+		const std::uint8_t opCode = *(machineCodeList.begin() + variationIndex);
 
-		// Next get the list of the machine codes for each variation:
-		const std::initializer_list<std::u8string_view>& machineCodeList = MachineCodeTable[instructionIndex];
-
-		// If we got a weird machine code index which is too large, return error. (Should not happen, but let's be safe!)
-		if (variationIndex >= machineCodeList.size()) [[unlikely]]
-		{
-			throw std::runtime_error("invalid instruction variation index!");
-		}
-
-		if (maxOpSize == Size::B8) [[likely]]
-		{
-			out << static_cast<char8_t>(PrefixType::RexW64);
-		}
-		else if (maxOpSize == Size::B4) [[likely]]
-		{
-			out << static_cast<char8_t>(PrefixType::AddressOverride);
-		}
-
-		// Get the machine code literal at the index of the variation.
-		const char8_t* const machineCode = (machineCodeList.begin() + variationIndex)->data();
-
-		// Write the machine code into the stream.
-		out << machineCode;
-
-		// Now write all operands into the stream.
-		WriteOperands(out, operands);
+		EncodedInstruction encoded = {};
+		auto& bits = encoded.Fields;
+		bits.Prefix = (operandSize == FixedSize::B8 ? RexW64 : 0) & 0xFF;
+		bits.OpCode &= 0x00'00'00U;
+		bits.OpCode |= ((twoByteOp ? 0x0FU : opCode) & 0xFFU) << 8U & 0xFF'FF'FFU;
+		bits.OpCode |= (twoByteOp ? opCode : 0x00U) & 0xFFU & 0xFF'FF'FFU;
+		return encoded;
 	}
 
-	void WriteOperands(MachineStream& out, const std::span<const Operand> operands)
-	{
-		// Write all bytes for each operand into the machine stream.
-		for (const auto& operand : operands)
-		{
-			operand.FlushBytes(out);
-		}
-	}
-
-	auto DetermineInstructionVariation(const Instruction instruction, const std::span<const Operand> operands) -> std::tuple<std::size_t, Size>
+	auto DetermineInstructionVariation(const Instruction instruction, const std::span<const Operand> operands) -> std::tuple<std::size_t, FixedSize>
 	{
 		// The index of the instruction for all the lookup tables.
 		const auto index = static_cast<std::size_t>(instruction);
@@ -71,7 +43,7 @@ namespace CyberAsm::X86
 			std::size_t validCount = 0;
 
 			// Max byte size of operands.
-			auto opSize = Size::B1;
+			auto opSize = FixedSize::B1;
 
 			// Compare each passed operand flag with the variation.
 			for (std::size_t j = 0; j < flagList.size(); ++j)
@@ -101,7 +73,7 @@ namespace CyberAsm::X86
 				if (required & givenFlags) [[unlikely]]
 				{
 					++validCount;
-					opSize = static_cast<Size>(std::max(static_cast<std::uint8_t>(opSize), static_cast<std::uint8_t>(OperandFlags::OperandByteSize(givenFlags))));
+					opSize = static_cast<FixedSize>(std::max(static_cast<std::uint8_t>(opSize), static_cast<std::uint8_t>(OperandFlags::OperandByteSize(givenFlags))));
 				}
 			}
 

@@ -5,7 +5,7 @@
 
 namespace CyberAsm::X86
 {
-	enum class Size : std::uint8_t
+	enum class FixedSize : std::uint8_t
 	{
 		B1 = 1,
 		B2 = 2,
@@ -50,7 +50,7 @@ namespace CyberAsm::X86
 		static constexpr auto IsExplicitRegister(Flags flags) noexcept -> bool;
 		static constexpr auto IsImmediate(Flags flags) noexcept -> bool;
 		static constexpr auto IsMemory(Flags flags) noexcept -> bool;
-		static constexpr auto OperandByteSize(Flags flags) noexcept -> Size;
+		static constexpr auto OperandByteSize(Flags flags) noexcept -> FixedSize;
 	};
 
 	constexpr auto OperandFlags::IsRegister(const Flags flags) noexcept -> bool
@@ -73,20 +73,20 @@ namespace CyberAsm::X86
 		return flags >= Mem8 && flags <= Mem64;
 	}
 
-	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> Size
+	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> FixedSize
 	{
 		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64 || flags & Imm64) [[likely]]
 		{
-			return Size::B8;
+			return FixedSize::B8;
 		}
 		if (flags == Reg32Eax || flags & Reg32 || flags & Mem32 || flags & Imm32) [[likely]]
 		{
-			return Size::B4;
+			return FixedSize::B4;
 		}
 		if (flags == Reg16Ax || flags & Reg16 || flags & Mem16 || flags & Imm16) [[unlikely]]
 		{
-			return Size::B2;
+			return FixedSize::B2;
 		}
-		return Size::B1;
+		return FixedSize::B1;
 	}
 }

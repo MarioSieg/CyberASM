@@ -5,20 +5,20 @@
 
 namespace CyberAsm
 {
-	MachineStream::MachineStream(std::vector<char8_t>&& vector) noexcept : stream(std::move(vector)) { }
+	MachineStream::MachineStream(std::vector<std::uint8_t>&& vector) noexcept : stream(std::move(vector)) { }
 
 	MachineStream::MachineStream(const std::vector<std::byte>& vector)
 	{
 		this->stream.reserve(vector.size());
 		for (const auto value : vector)
 		{
-			this->stream.push_back(static_cast<char8_t>(value));
+			this->stream.push_back(static_cast<std::uint8_t>(value));
 		}
 	}
 
-	MachineStream::MachineStream(const char8_t* const memory, const std::size_t size) : stream(memory, memory + size) { }
+	MachineStream::MachineStream(const std::uint8_t* const memory, const std::size_t size) : stream(memory, memory + size) { }
 
-	MachineStream::MachineStream(const std::byte* const memory, const std::size_t size) : MachineStream(reinterpret_cast<const char8_t*>(memory), size) { }
+	MachineStream::MachineStream(const std::byte* const memory, const std::size_t size) : MachineStream(reinterpret_cast<const std::uint8_t*>(memory), size) { }
 
 	MachineStream::MachineStream(const std::size_t capacity)
 	{
@@ -27,7 +27,7 @@ namespace CyberAsm
 
 	auto MachineStream::operator<<(const std::byte value) -> MachineStream&
 	{
-		this->stream.push_back(static_cast<char8_t>(value));
+		this->stream.push_back(static_cast<std::uint8_t>(value));
 		return *this;
 	}
 
@@ -109,12 +109,6 @@ namespace CyberAsm
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char8_t value) -> MachineStream&
-	{
-		this->Insert(value);
-		return *this;
-	}
-
 	auto MachineStream::operator<<(const char16_t value) -> MachineStream&
 	{
 		this->Insert(value);
@@ -145,7 +139,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const char8_t* value) -> MachineStream&
+	auto MachineStream::operator<<(const std::uint8_t* value) -> MachineStream&
 	{
 		while (*value) [[likely]]
 		{
@@ -191,7 +185,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::span<char8_t> value) -> MachineStream&
+	auto MachineStream::operator<<(const std::span<std::uint8_t> value) -> MachineStream&
 	{
 		this->stream.reserve(this->stream.size() + value.size());
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
@@ -203,12 +197,12 @@ namespace CyberAsm
 		this->stream.reserve(this->stream.size() + value.size());
 		for (const auto value : value)
 		{
-			this->stream.push_back(static_cast<char8_t>(value));
+			this->stream.push_back(static_cast<std::uint8_t>(value));
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(const std::vector<char8_t>& value) -> MachineStream&
+	auto MachineStream::operator<<(const std::vector<std::uint8_t>& value) -> MachineStream&
 	{
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
@@ -219,12 +213,12 @@ namespace CyberAsm
 		this->stream.reserve(this->stream.size() + value.size());
 		for (const auto value : value)
 		{
-			this->stream.push_back(static_cast<char8_t>(value));
+			this->stream.push_back(static_cast<std::uint8_t>(value));
 		}
 		return *this;
 	}
 
-	auto MachineStream::operator<<(std::initializer_list<char8_t>&& value) -> MachineStream&
+	auto MachineStream::operator<<(std::initializer_list<std::uint8_t>&& value) -> MachineStream&
 	{
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
@@ -236,22 +230,22 @@ namespace CyberAsm
 		return *this;
 	}
 
-	auto MachineStream::operator[](const std::size_t idx) -> char8_t&
+	auto MachineStream::operator[](const std::size_t idx) -> std::uint8_t&
 	{
 		return this->stream.at(idx);
 	}
 
-	auto MachineStream::operator[](const std::size_t idx) const -> char8_t
+	auto MachineStream::operator[](const std::size_t idx) const -> std::uint8_t
 	{
 		return this->stream.at(idx);
 	}
 
-	auto MachineStream::operator*() -> char8_t&
+	auto MachineStream::operator*() -> std::uint8_t&
 	{
 		return this->stream.front();
 	}
 
-	auto MachineStream::operator*() const -> char8_t
+	auto MachineStream::operator*() const -> std::uint8_t
 	{
 		return this->stream.front();
 	}
@@ -267,17 +261,17 @@ namespace CyberAsm
 		return true;
 	}
 
-	auto MachineStream::Stream() const & noexcept -> const std::vector<char8_t>&
+	auto MachineStream::Stream() const & noexcept -> const std::vector<std::uint8_t>&
 	{
 		return this->stream;
 	}
 
-	auto MachineStream::Stream() & noexcept -> std::vector<char8_t>&
+	auto MachineStream::Stream() & noexcept -> std::vector<std::uint8_t>&
 	{
 		return this->stream;
 	}
 
-	auto MachineStream::Stream() && noexcept -> std::vector<char8_t>&&
+	auto MachineStream::Stream() && noexcept -> std::vector<std::uint8_t>&&
 	{
 		return std::move(this->stream);
 	}
@@ -313,13 +307,13 @@ namespace CyberAsm
 		return this->stream.size();
 	}
 
-	void MachineStream::InsertPadding(const std::size_t byteSize, const char8_t scalar, const std::size_t needle)
+	void MachineStream::InsertPadding(const std::size_t byteSize, const std::uint8_t scalar, const std::size_t needle)
 	{
 		this->stream.resize(this->stream.size() + byteSize);
 		std::fill_n(this->stream.end() - byteSize, byteSize, scalar);
 	}
 
-	void MachineStream::InsertPadding(const std::size_t from, const std::size_t to, const char8_t scalar)
+	void MachineStream::InsertPadding(const std::size_t from, const std::size_t to, const std::uint8_t scalar)
 	{
 		for (auto i = from; i < to; ++i)
 		{
@@ -327,56 +321,56 @@ namespace CyberAsm
 		}
 	}
 
-	auto MachineStream::Insert(const std::vector<char8_t>::const_iterator begin, const std::vector<char8_t>::const_iterator end) -> std::vector<char8_t>&
+	auto MachineStream::Insert(const std::vector<std::uint8_t>::const_iterator begin, const std::vector<std::uint8_t>::const_iterator end) -> std::vector<std::uint8_t>&
 	{
 		this->stream.insert(this->stream.end(), begin, end);
 		return this->stream;
 	}
 
-	auto MachineStream::begin() const noexcept -> std::vector<char8_t>::const_iterator
+	auto MachineStream::begin() const noexcept -> std::vector<std::uint8_t>::const_iterator
 	{
 		return this->stream.begin();
 	}
 
-	auto MachineStream::end() const noexcept -> std::vector<char8_t>::const_iterator
+	auto MachineStream::end() const noexcept -> std::vector<std::uint8_t>::const_iterator
 	{
 		return this->stream.end();
 	}
 
-	auto MachineStream::begin() noexcept -> std::vector<char8_t>::iterator
+	auto MachineStream::begin() noexcept -> std::vector<std::uint8_t>::iterator
 	{
 		return this->stream.begin();
 	}
 
-	auto MachineStream::end() noexcept -> std::vector<char8_t>::iterator
+	auto MachineStream::end() noexcept -> std::vector<std::uint8_t>::iterator
 	{
 		return this->stream.end();
 	}
 
-	auto MachineStream::rbegin() const noexcept -> std::vector<char8_t>::const_reverse_iterator
+	auto MachineStream::rbegin() const noexcept -> std::vector<std::uint8_t>::const_reverse_iterator
 	{
 		return this->stream.rbegin();
 	}
 
-	auto MachineStream::rend() const noexcept -> std::vector<char8_t>::const_reverse_iterator
+	auto MachineStream::rend() const noexcept -> std::vector<std::uint8_t>::const_reverse_iterator
 	{
 		return this->stream.rend();
 	}
 
-	auto MachineStream::rbegin() noexcept -> std::vector<char8_t>::reverse_iterator
+	auto MachineStream::rbegin() noexcept -> std::vector<std::uint8_t>::reverse_iterator
 	{
 		return this->stream.rbegin();
 	}
 
-	auto MachineStream::rend() noexcept -> std::vector<char8_t>::reverse_iterator
+	auto MachineStream::rend() noexcept -> std::vector<std::uint8_t>::reverse_iterator
 	{
 		return this->stream.rend();
 	}
 
-	auto MachineStream::Insert(const void* const mem, const std::size_t size) -> std::vector<char8_t>&
+	auto MachineStream::Insert(const void* const mem, const std::size_t size) -> std::vector<std::uint8_t>&
 	{
-		const auto* byte = static_cast<const char8_t*>(mem);
-		const auto* const end = static_cast<const char8_t*>(mem) + size - 1;
+		const auto* byte = static_cast<const std::uint8_t*>(mem);
+		const auto* const end = static_cast<const std::uint8_t*>(mem) + size - 1;
 		while (byte != end)
 		{
 			*this << *byte++;
@@ -402,7 +396,7 @@ namespace CyberAsm
 		for (std::size_t i = 0; i < stream.Size(); ++i)
 		{
 			out << std::setw(2) << std::setfill('0') << std::right << std::hex << std::uppercase;
-			const char8_t value = stream[i];
+			const std::uint8_t value = stream[i];
 			if (value == 0) [[unlikely]]
 			{
 				out << "00 ";
@@ -426,32 +420,32 @@ namespace CyberAsm
 		return out;
 	}
 
-	auto MachineStream::Contains(const char8_t target) const -> bool
+	auto MachineStream::Contains(const std::uint8_t target) const -> bool
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target) != this->stream.end();
 	}
 
-	auto MachineStream::Find(const char8_t target) -> std::vector<char8_t>::iterator
+	auto MachineStream::Find(const std::uint8_t target) -> std::vector<std::uint8_t>::iterator
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target);
 	}
 
-	auto MachineStream::Find(const char8_t target) const -> std::vector<char8_t>::const_iterator
+	auto MachineStream::Find(const std::uint8_t target) const -> std::vector<std::uint8_t>::const_iterator
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target);
 	}
 
-	auto MachineStream::Contains(const std::span<char8_t> sequence) const -> bool
+	auto MachineStream::Contains(const std::span<std::uint8_t> sequence) const -> bool
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end()) != this->stream.end();
 	}
 
-	auto MachineStream::Find(const std::span<char8_t> sequence) -> std::vector<char8_t>::iterator
+	auto MachineStream::Find(const std::span<std::uint8_t> sequence) -> std::vector<std::uint8_t>::iterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
 	}
 
-	auto MachineStream::Find(const std::span<char8_t> sequence) const -> std::vector<char8_t>::const_iterator
+	auto MachineStream::Find(const std::span<std::uint8_t> sequence) const -> std::vector<std::uint8_t>::const_iterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
 	}
