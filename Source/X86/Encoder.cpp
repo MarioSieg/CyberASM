@@ -2,6 +2,7 @@
 #include "../../Include/CyAsm/X86/Encoder.hpp"
 #include "../../Include/CyAsm/X86/Instructions.hpp"
 #include "../../Include/CyAsm/X86/Operand.hpp"
+#include "../../Include/CyAsm/X86/Prefix.hpp"
 
 namespace CyberAsm::X86
 {
@@ -9,18 +10,15 @@ namespace CyberAsm::X86
 	{		
 		const auto instructionIndex = static_cast<std::size_t>(instruction);
 		const std::tuple<std::size_t, FixedSize> variation = DetermineInstructionVariation(instruction, operands);
-		const std::size_t variationIndex = std::get<0>(variation);
-		const FixedSize operandSize = std::get<1>(variation);
-		const std::initializer_list<std::uint8_t>& machineCodeList = MachineCodeTable[instructionIndex];
 		const bool twoByteOp = TwoByteOpcodeTable[instructionIndex];
-		const std::uint8_t opCode = *(machineCodeList.begin() + variationIndex);
+		const std::uint8_t opCode = *(MachineCodeTable[instructionIndex].begin() + std::get<0>(variation));
+		
 
 		EncodedInstruction encoded = {};
 		auto& bits = encoded.Fields;
-		bits.Prefix = (operandSize == FixedSize::B8 ? RexW64 : 0) & 0xFF;
-		bits.OpCode &= 0x00'00'00U;
-		bits.OpCode |= ((twoByteOp ? 0x0FU : opCode) & 0xFFU) << 8U & 0xFF'FF'FFU;
-		bits.OpCode |= (twoByteOp ? opCode : 0x00U) & 0xFFU & 0xFF'FF'FFU;
+		bits.Prefix = (std::get<1>(variation) == FixedSize::QWord ? RexW64 : 0) & 0xFF;
+		bits.OpCode1 = twoByteOp ? TwoByteOpCodePrefix : 0;
+		bits.OpCode0 = opCode;
 		return encoded;
 	}
 
@@ -43,7 +41,7 @@ namespace CyberAsm::X86
 			std::size_t validCount = 0;
 
 			// Max byte size of operands.
-			auto opSize = FixedSize::B1;
+			auto opSize = FixedSize::Byte;
 
 			// Compare each passed operand flag with the variation.
 			for (std::size_t j = 0; j < flagList.size(); ++j)

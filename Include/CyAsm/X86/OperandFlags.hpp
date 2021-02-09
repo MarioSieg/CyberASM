@@ -7,10 +7,10 @@ namespace CyberAsm::X86
 {
 	enum class FixedSize : std::uint8_t
 	{
-		B1 = 1,
-		B2 = 2,
-		B4 = 4,
-		B8 = 8
+		Byte = 1,
+		Word = 2,
+		DWord = 4,
+		QWord = 8
 	};
 
 	struct OperandFlags final
@@ -77,16 +77,16 @@ namespace CyberAsm::X86
 	{
 		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64 || flags & Imm64) [[likely]]
 		{
-			return FixedSize::B8;
+			return FixedSize::QWord;
 		}
 		if (flags == Reg32Eax || flags & Reg32 || flags & Mem32 || flags & Imm32) [[likely]]
 		{
-			return FixedSize::B4;
+			return FixedSize::DWord;
 		}
 		if (flags == Reg16Ax || flags & Reg16 || flags & Mem16 || flags & Imm16) [[unlikely]]
 		{
-			return FixedSize::B2;
+			return FixedSize::Word;
 		}
-		return FixedSize::B1;
+		return FixedSize::Byte;
 	}
 }

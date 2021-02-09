@@ -1,11 +1,11 @@
 #pragma once
 
 #include "OperandFlags.hpp"
-#include "Prefix.hpp"
 
 #include <cstdint>
 #include <string_view>
 #include <array>
+#include <bitset>
 
 namespace CyberAsm::X86
 {
@@ -72,18 +72,25 @@ namespace CyberAsm::X86
 	{
 		struct Fields final {
 			std::uint32_t Prefix : 8 = 0;
-			std::uint32_t OpCode : 24 = 0;
+			std::uint32_t OpCode2 : 8 = 0;
+			std::uint32_t OpCode1 : 8 = 0;
+			std::uint32_t OpCode0 : 8 = 0;
+			
 			std::uint32_t Mod : 2 = 0;
 			std::uint32_t Reg : 3 = 0;
 			std::uint32_t Rm : 3 = 0;
+			
 			std::uint32_t Scale : 2 = 0;
 			std::uint32_t Index : 3 = 0;
 			std::uint32_t Base : 3 = 0;
+			
 			std::uint32_t Disp : 32 = 0;
 			std::uint32_t Imm : 32 = 0;
 		} Fields;
 		
 		std::array<std::uint8_t, sizeof(Fields)> Packed = {};
+
+		static constexpr std::bitset<8> MandatoryByteMask = 0b0'001'0'0'0000'0000;
 	};
 
 	static_assert(sizeof(EncodedInstruction) == 16);
