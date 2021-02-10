@@ -1,25 +1,72 @@
 #include "../../Include/CyAsm/MachineStream.hpp"
 #include "../../Include/CyAsm/X86/Encoder.hpp"
+
+#include <iostream>
+
 #include "../../Include/CyAsm/X86/Instructions.hpp"
 #include "../../Include/CyAsm/X86/Operand.hpp"
-#include "../../Include/CyAsm/X86/Prefix.hpp"
+#include "../../Include/CyAsm/X86/MachineLanguage.hpp"
 
 namespace CyberAsm::X86
 {
-	auto Encode(const Instruction instruction, const std::span<const Operand> operands) -> EncodedInstruction
-	{		
+	auto Encode(MachineStream& out, const Instruction instruction, const std::span<const Operand> operands) -> std::size_t
+	{
+		const auto diff = operands.size();
 		const auto instructionIndex = static_cast<std::size_t>(instruction);
 		const std::tuple<std::size_t, FixedSize> variation = DetermineInstructionVariation(instruction, operands);
 		const bool twoByteOp = TwoByteOpcodeTable[instructionIndex];
 		const std::uint8_t opCode = *(MachineCodeTable[instructionIndex].begin() + std::get<0>(variation));
-		
+		const std::uint8_t opCodeEx = *(MachineCodeExtensionTable[instructionIndex].begin() + std::get<0>(variation));
+		// @formatter:off
 
-		EncodedInstruction encoded = {};
-		auto& bits = encoded.Fields;
-		bits.Prefix = (std::get<1>(variation) == FixedSize::QWord ? RexW64 : 0) & 0xFF;
-		bits.OpCode1 = twoByteOp ? TwoByteOpCodePrefix : 0;
-		bits.OpCode0 = opCode;
-		return encoded;
+		const std::uint8_t mod = ModBitsRegisterAddressing;
+		const std::uint8_t imm = 0xFF;
+		const std::uint8_t reg = RegisterIdTable[static_cast<std::size_t>(Register::Eax)];
+
+		if (std::get<1>(variation) == FixedSize::QWord) [[unlikely]]
+		{
+			out << RexW64;
+		}
+		if (twoByteOp) [[unlikely]]
+		{
+			out << TwoByteOpCodePrefix;
+		}
+		out << opCode;
+
+		const union ModRm
+		{
+			struct
+			{
+				std::uint8_t Rm : 3;
+				std::uint8_t Reg : 3;
+				std::uint8_t Mod : 2;
+			} Bits;
+			std::uint8_t Packed;
+			static_assert(sizeof Bits == 1);
+		} modRm = { .Bits = {.Rm = reg, .Reg = opCodeEx, .Mod = mod} };
+
+		out << modRm.Packed;
+
+		const union Sib
+		{
+			struct
+			{
+				std::uint8_t Scale : 2;
+				std::uint8_t Index : 3;
+				std::uint8_t Base : 3;
+			} Bits;
+			std::uint8_t Packed;
+
+			static_assert(sizeof Bits == 1);
+		} sib = { .Bits = {0, 0, 0} };
+
+		if (sib.Packed) [[likely]]
+		{
+			out << sib.Packed;
+		}
+		out << imm;
+
+		return operands.size() - diff;
 	}
 
 	auto DetermineInstructionVariation(const Instruction instruction, const std::span<const Operand> operands) -> std::tuple<std::size_t, FixedSize>
@@ -53,13 +100,24 @@ namespace CyberAsm::X86
 				OperandFlags::Flags additionalFlags = OperandFlags::None;
 				switch (givenFlags)
 				{
-						[[unlikely]] case OperandFlags::Reg8Al: additionalFlags = OperandFlags::Reg8;
+					[[unlikely]]
+					case OperandFlags::Reg8Al:
+						additionalFlags = OperandFlags::Reg8;
 						break;
-						[[unlikely]] case OperandFlags::Reg16Ax: additionalFlags = OperandFlags::Reg16;
+
+					[[unlikely]]
+					case OperandFlags::Reg16Ax:
+						additionalFlags = OperandFlags::Reg16;
 						break;
-						[[unlikely]] case OperandFlags::Reg32Eax: additionalFlags = OperandFlags::Reg32;
+
+					[[likely]]
+					case OperandFlags::Reg32Eax:
+						additionalFlags = OperandFlags::Reg32;
 						break;
-						[[unlikely]] case OperandFlags::Reg64Rax: additionalFlags = OperandFlags::Reg64;
+
+					[[likely]]
+					case OperandFlags::Reg64Rax:
+						additionalFlags = OperandFlags::Reg64;
 						break;
 				}
 				givenFlags |= additionalFlags;
@@ -71,7 +129,8 @@ namespace CyberAsm::X86
 				if (required & givenFlags) [[unlikely]]
 				{
 					++validCount;
-					opSize = static_cast<FixedSize>(std::max(static_cast<std::uint8_t>(opSize), static_cast<std::uint8_t>(OperandFlags::OperandByteSize(givenFlags))));
+					const auto x = OperandFlags::OperandByteSize(givenFlags);
+					opSize = static_cast<FixedSize>(std::max(static_cast<std::uint8_t>(opSize), static_cast<std::uint8_t>(x)));
 				}
 			}
 

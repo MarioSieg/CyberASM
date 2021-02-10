@@ -24,7 +24,7 @@ add_library("libcyberasm" STATIC
 	 
 	  
 	 
-	"Include/CyAsm/Utils.hpp" "Include/CyAsm/X86/Operand.hpp" "Include/CyAsm/X86/OperandFlags.hpp"  "Include/CyAsm/X86/Encoder.hpp" "Source/X86/Encoder.cpp" "Source/X86/Operand.cpp" "Include/CyAsm/X86/OperandTypes.hpp"  "Include/CyAsm/X86/Prefix.hpp")
+	"Include/CyAsm/Utils.hpp" "Include/CyAsm/X86/Operand.hpp" "Include/CyAsm/X86/OperandFlags.hpp"  "Include/CyAsm/X86/Encoder.hpp" "Source/X86/Encoder.cpp" "Source/X86/Operand.cpp" "Include/CyAsm/X86/OperandTypes.hpp"    "Include/CyAsm/X86/MachineLanguage.hpp")
 
 add_executable("cyberasm" "Source/Main.cpp")
 target_link_libraries("cyberasm" "libcyberasm")

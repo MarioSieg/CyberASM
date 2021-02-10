@@ -37,7 +37,6 @@ namespace CyberAsm::X86
 			Imm8 = 1 << 13,
 			Imm16 = 1 << 14,
 			Imm32 = 1 << 15,
-			Imm64 = 1 << 16,
 
 			Reg_16_32_64 = Reg16 | Reg32 | Reg64,
 			Mem_16_32_64 = Mem16 | Mem32 | Mem64,
@@ -47,7 +46,7 @@ namespace CyberAsm::X86
 		using Flags = std::underlying_type<Enum>::type;
 
 		static constexpr auto IsRegister(Flags flags) noexcept -> bool;
-		static constexpr auto IsExplicitRegister(Flags flags) noexcept -> bool;
+		static constexpr auto IsImplicitRegister(Flags flags) noexcept -> bool;
 		static constexpr auto IsImmediate(Flags flags) noexcept -> bool;
 		static constexpr auto IsMemory(Flags flags) noexcept -> bool;
 		static constexpr auto OperandByteSize(Flags flags) noexcept -> FixedSize;
@@ -58,14 +57,14 @@ namespace CyberAsm::X86
 		return flags > 0 && flags <= Reg64Rax;
 	}
 
-	constexpr auto OperandFlags::IsExplicitRegister(const Flags flags) noexcept -> bool
+	constexpr auto OperandFlags::IsImplicitRegister(const Flags flags) noexcept -> bool
 	{
 		return flags >= Reg8Al && flags <= Reg64Rax;
 	}
 
 	constexpr auto OperandFlags::IsImmediate(const Flags flags) noexcept -> bool
 	{
-		return flags >= Imm8 && flags <= Imm64;
+		return flags >= Imm8 && flags <= Imm32;
 	}
 
 	constexpr auto OperandFlags::IsMemory(const Flags flags) noexcept -> bool
@@ -75,7 +74,7 @@ namespace CyberAsm::X86
 
 	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> FixedSize
 	{
-		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64 || flags & Imm64) [[likely]]
+		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64) [[likely]]
 		{
 			return FixedSize::QWord;
 		}

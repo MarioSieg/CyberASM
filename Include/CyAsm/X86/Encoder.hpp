@@ -10,11 +10,8 @@ namespace CyberAsm
 
 	namespace X86
 	{	
-
 		[[nodiscard]]
-		extern auto Encode(Instruction instruction, std::span<const Operand> operands) -> EncodedInstruction;
-
-		extern void WriteOperands(std::span<const Operand> operands);
+		extern auto Encode(MachineStream& out, Instruction instruction, std::span<const Operand> operands) -> std::size_t;
 
 		[[nodiscard]]
 		extern auto DetermineInstructionVariation(Instruction instruction, std::span<const Operand> operands) -> std::tuple<std::size_t, FixedSize>;

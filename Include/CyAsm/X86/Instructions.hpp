@@ -3,9 +3,13 @@
 #include "OperandFlags.hpp"
 
 #include <cstdint>
-#include <string_view>
+#include <optional>
 #include <array>
 #include <bitset>
+
+namespace CyberAsm {
+	class MachineStream;
+}
 
 namespace CyberAsm::X86
 {
@@ -48,6 +52,15 @@ namespace CyberAsm::X86
 		false
 	};
 
+	constexpr std::array <std::initializer_list<std::uint8_t>, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
+	{
+		// adc
+		std::initializer_list<std::uint8_t>
+		{
+			0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2, 0x2, 0x2
+		}
+	};
+
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
 	{
 		"adc"
@@ -67,31 +80,4 @@ namespace CyberAsm::X86
 
 	constexpr auto AreTablesValidated = ValidateTables();
 	static_assert(AreTablesValidated);
-
-	union EncodedInstruction
-	{
-		struct Fields final {
-			std::uint32_t Prefix : 8 = 0;
-			std::uint32_t OpCode2 : 8 = 0;
-			std::uint32_t OpCode1 : 8 = 0;
-			std::uint32_t OpCode0 : 8 = 0;
-			
-			std::uint32_t Mod : 2 = 0;
-			std::uint32_t Reg : 3 = 0;
-			std::uint32_t Rm : 3 = 0;
-			
-			std::uint32_t Scale : 2 = 0;
-			std::uint32_t Index : 3 = 0;
-			std::uint32_t Base : 3 = 0;
-			
-			std::uint32_t Disp : 32 = 0;
-			std::uint32_t Imm : 32 = 0;
-		} Fields;
-		
-		std::array<std::uint8_t, sizeof(Fields)> Packed = {};
-
-		static constexpr std::bitset<8> MandatoryByteMask = 0b0'001'0'0'0000'0000;
-	};
-
-	static_assert(sizeof(EncodedInstruction) == 16);
 }

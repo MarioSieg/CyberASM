@@ -17,11 +17,7 @@ auto main(const int argc, const char* const* const argv) -> int
 
 	try
 	{
-		const EncodedInstruction instr = Encode(Instruction::Adc, operands);
-		for(const auto byte : instr.Packed)
-		{
-			std::cout << std::hex << std::uppercase << static_cast<std::uint16_t>(byte) << ' ';
-		}
+		Encode(out, Instruction::Adc, operands);
 	}
 	catch (const std::exception& ex)
 	{

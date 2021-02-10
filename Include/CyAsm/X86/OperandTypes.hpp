@@ -10,7 +10,7 @@ namespace CyberAsm
 	{
 		std::is_trivial_v<T>;
 		std::is_integral_v<T>;
-		sizeof(T) <= 8;
+		sizeof(T) <= 4;
 	};
 
 	template <typename T> requires ValidOperand<T>
@@ -32,5 +32,4 @@ namespace CyberAsm
 	using Imm8 = Imm<std::uint8_t>;
 	using Imm16 = Imm<std::uint16_t>;
 	using Imm32 = Imm<std::uint32_t>;
-	using Imm64 = Imm<std::uint64_t>;
 }

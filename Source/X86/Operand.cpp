@@ -23,12 +23,6 @@ namespace CyberAsm::X86
 		this->flags = OperandFlags::Imm32;
 	}
 
-	Operand::Operand(const Imm64 value) noexcept
-	{
-		this->data.Imm64 = value;
-		this->flags = OperandFlags::Imm64;
-	}
-
 	Operand::Operand(const Register value) noexcept
 	{
 		this->data.Reg = value;
@@ -78,40 +72,5 @@ namespace CyberAsm::X86
 	auto Operand::Flags() const noexcept -> OperandFlags::Flags
 	{
 		return this->flags;
-	}
-
-	auto Operand::FlushBytes(MachineStream& out) const -> std::size_t
-	{
-		if (OperandFlags::IsExplicitRegister(this->flags)) [[unlikely]]
-		{
-			return 0;
-		}
-
-		const auto prev = out.Size();
-
-		if (OperandFlags::IsRegister(this->flags)) [[likely]]
-		{
-			out << RegisterIdTable[static_cast<std::size_t>(this->data.Reg)];
-		}
-		else
-		{
-			switch (this->flags)
-			{
-				case OperandFlags::Imm8:
-					out << this->data.Imm8.Value;
-					break;
-				case OperandFlags::Imm16:
-					out << this->data.Imm16.Value;
-					break;
-				case OperandFlags::Imm32:
-					out << this->data.Imm32.Value;
-					break;
-				case OperandFlags::Imm64:
-					out << this->data.Imm64.Value;
-					break;
-			}
-		}
-
-		return out.Size() - prev;
 	}
 }
