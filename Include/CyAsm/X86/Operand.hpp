@@ -17,7 +17,7 @@ namespace CyberAsm
 			Imm8 Imm8;
 			Imm16 Imm16;
 			Imm32 Imm32;
-			Register Reg;
+			Register Register;
 		};
 
 		class [[nodiscard]] Operand final
@@ -28,7 +28,7 @@ namespace CyberAsm
             explicit constexpr Operand(Imm32 value) noexcept;
             explicit constexpr Operand(Register value) noexcept;
 
-            [[nodiscard]] constexpr auto Data() const noexcept -> const OperandData&;
+            [[nodiscard]] constexpr auto Unwrap() const noexcept -> const OperandData&;
             [[nodiscard]] constexpr auto Flags() const noexcept -> OperandFlags::Flags;
             [[nodiscard]] constexpr auto IsRegister() const noexcept -> bool;
             [[nodiscard]] constexpr auto IsImplicitRegister() const noexcept -> bool;
@@ -61,7 +61,7 @@ namespace CyberAsm
 
         constexpr Operand::Operand(const Register value) noexcept
         {
-            this->data.Reg = value;
+            this->data.Register = value;
             if (value == Register::Al) [[unlikely]]
             {
                 this->flags = OperandFlags::Reg8Al;
@@ -100,7 +100,7 @@ namespace CyberAsm
             }
         }
 
-        constexpr auto Operand::Data() const noexcept -> const OperandData&
+        constexpr auto Operand::Unwrap() const noexcept -> const OperandData&
         {
             return this->data;
         }

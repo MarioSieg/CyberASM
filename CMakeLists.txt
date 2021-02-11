@@ -18,7 +18,7 @@ add_library("libcyberasm" STATIC
 
 	"Include/CyAsm/X86/Syntax.h" 
 	"Include/CyAsm/X86/Registers.hpp" 
-	"Include/CyAsm/X86/Size.hpp" 
+	 
 	"Include/CyAsm/X86/Instructions.hpp" 
         "Include/CyAsm/X86/Operand.hpp"
         "Include/CyAsm/X86/OperandFlags.hpp"

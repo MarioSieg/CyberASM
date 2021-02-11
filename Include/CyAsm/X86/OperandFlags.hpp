@@ -37,10 +37,12 @@ namespace CyberAsm::X86
 			Imm8 = 1 << 13,
 			Imm16 = 1 << 14,
 			Imm32 = 1 << 15,
+			Imm64 = 1 << 16,
 
 			Reg_16_32_64 = Reg16 | Reg32 | Reg64,
 			Mem_16_32_64 = Mem16 | Mem32 | Mem64,
 			RegMem_16_32_64 = Reg16 | Mem16 | Reg32 | Mem32 | Reg64 | Mem64,
+			Reg_Rax64_Eax32_Ax16 = Reg64Rax | Reg32Eax | Reg16Ax
 		};
 
 		using Flags = std::underlying_type<Enum>::type;
@@ -64,7 +66,7 @@ namespace CyberAsm::X86
 
 	constexpr auto OperandFlags::IsImmediate(const Flags flags) noexcept -> bool
 	{
-		return flags >= Imm8 && flags <= Imm32;
+		return flags >= Imm8 && flags <= Imm64;
 	}
 
 	constexpr auto OperandFlags::IsMemory(const Flags flags) noexcept -> bool
@@ -74,7 +76,7 @@ namespace CyberAsm::X86
 
 	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> FixedSize
 	{
-		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64) [[likely]]
+		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64 || flags & Imm64) [[likely]]
 		{
 			return FixedSize::QWord;
 		}
