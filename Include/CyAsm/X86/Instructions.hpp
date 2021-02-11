@@ -7,7 +7,8 @@
 #include <array>
 #include <bitset>
 
-namespace CyberAsm {
+namespace CyberAsm
+{
 	class MachineStream;
 }
 
@@ -52,7 +53,7 @@ namespace CyberAsm::X86
 		false
 	};
 
-	constexpr std::array <std::initializer_list<std::uint8_t>, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
+	constexpr std::array<std::initializer_list<std::uint8_t>, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
 	{
 		// adc
 		std::initializer_list<std::uint8_t>

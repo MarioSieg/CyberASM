@@ -1,8 +1,5 @@
 #include "../../Include/CyAsm/MachineStream.hpp"
 #include "../../Include/CyAsm/X86/Encoder.hpp"
-
-#include <iostream>
-
 #include "../../Include/CyAsm/X86/Instructions.hpp"
 #include "../../Include/CyAsm/X86/Operand.hpp"
 #include "../../Include/CyAsm/X86/MachineLanguage.hpp"
