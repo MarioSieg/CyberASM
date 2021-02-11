@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Operand.hpp"
-
 #include <span>
+
+#include "Operand.hpp"
 
 namespace CyberAsm
 {

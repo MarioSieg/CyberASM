@@ -1,12 +1,12 @@
 #pragma once
 
-#include "MachineLanguage.hpp"
-
 #include <filesystem>
 #include <optional>
 #include <string>
 #include <vector>
 #include <span>
+
+#include "MachineLanguage.hpp"
 
 namespace CyberAsm
 {

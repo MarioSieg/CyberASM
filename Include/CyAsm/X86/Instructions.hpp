@@ -1,11 +1,11 @@
 #pragma once
 
-#include "OperandFlags.hpp"
-
 #include <cstdint>
 #include <optional>
 #include <array>
 #include <bitset>
+
+#include "OperandFlags.hpp"
 
 namespace CyberAsm
 {

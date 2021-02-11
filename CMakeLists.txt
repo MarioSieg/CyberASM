@@ -10,21 +10,24 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=native -Ofast")
 
 message("${CMAKE_CXX_FLAGS}")
 
-add_library("libcyberasm" STATIC 
+add_library("libcyberasm" STATIC
+        "Include/CyAsm/StreamReader.hpp"
+        "Include/CyAsm/MachineLanguage.hpp"
+        "Include/CyAsm/MachineStream.hpp"
+        "Include/CyAsm/Utils.hpp"
+
 	"Include/CyAsm/X86/Syntax.h" 
 	"Include/CyAsm/X86/Registers.hpp" 
 	"Include/CyAsm/X86/Size.hpp" 
-	"Include/CyAsm/StreamReader.hpp" 
 	"Include/CyAsm/X86/Instructions.hpp" 
-	 
-	"Include/CyAsm/MachineLanguage.hpp" 
-	"Include/CyAsm/MachineStream.hpp" 
-	"Source/MachineStream.cpp"     
-	  
-	 
-	  
-	 
-	"Include/CyAsm/Utils.hpp" "Include/CyAsm/X86/Operand.hpp" "Include/CyAsm/X86/OperandFlags.hpp"  "Include/CyAsm/X86/Encoder.hpp" "Source/X86/Encoder.cpp" "Source/X86/Operand.cpp" "Include/CyAsm/X86/OperandTypes.hpp"    "Include/CyAsm/X86/MachineLanguage.hpp")
+        "Include/CyAsm/X86/Operand.hpp"
+        "Include/CyAsm/X86/OperandFlags.hpp"
+        "Include/CyAsm/X86/Encoder.hpp"
+        "Include/CyAsm/X86/OperandTypes.hpp"
+        "Include/CyAsm/X86/MachineLanguage.hpp"
+
+        "Source/MachineStream.cpp"
+        "Source/X86/Encoder.cpp")
 
 add_executable("cyberasm" "Source/Main.cpp")
 target_link_libraries("cyberasm" "libcyberasm")

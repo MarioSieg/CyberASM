@@ -1,9 +1,10 @@
 #pragma once
 
-#include "X86/Instructions.hpp"
-
 #include <array>
 #include <algorithm>
+
+
+#include "X86/Instructions.hpp"
 
 namespace CyberAsm
 {
