@@ -10,6 +10,14 @@
 
 namespace CyberAsm
 {
+	enum class TargetArchitecture
+	{
+		X86_16,
+		X86_32,
+		X86_64,
+		ARM_64
+	};
+	
 	/// <summary>
 	/// Represents machine code.
 	/// It uses std::uint8_t as byte type (because a stream byte can be an ASCII character or a value)
@@ -22,12 +30,12 @@ namespace CyberAsm
 		friend auto operator <<(std::ostream& out, const MachineStream& stream) -> std::ostream&;
 		inline static std::size_t DumpTextLineLimit = 8;
 
-		MachineStream() = default;
-		explicit MachineStream(std::vector<std::uint8_t>&& vector) noexcept;
-		explicit MachineStream(const std::vector<std::byte>& vector);
-		explicit MachineStream(const std::uint8_t* memory, std::size_t size);
-		explicit MachineStream(const std::byte* memory, std::size_t size);
-		explicit MachineStream(std::size_t capacity);
+		explicit MachineStream(TargetArchitecture targetArchitecture) noexcept;
+		MachineStream(TargetArchitecture targetArchitecture, std::vector<std::uint8_t>&& vector) noexcept;
+		MachineStream(TargetArchitecture targetArchitecture, const std::vector<std::byte>& vector);
+		MachineStream(TargetArchitecture targetArchitecture, const std::uint8_t* memory, std::size_t size);
+		MachineStream(TargetArchitecture targetArchitecture, const std::byte* memory, std::size_t size);
+		MachineStream(TargetArchitecture targetArchitecture, std::size_t capacity);
 
 		MachineStream(const MachineStream&) = default;
 		MachineStream(MachineStream&&) noexcept = default;
@@ -80,6 +88,7 @@ namespace CyberAsm
 		auto operator <<(const std::vector<std::uint8_t>& value) -> MachineStream&;
 		auto operator <<(const std::vector<std::byte>& value) -> MachineStream&;
 		auto operator <<(std::initializer_list<std::uint8_t>&& value) -> MachineStream&;
+		auto operator <<(std::bitset<8> byteBits)->MachineStream&;
 		auto operator <<(const void* value) -> MachineStream&;
 
 		auto operator [](std::size_t idx) -> std::uint8_t&;
@@ -91,9 +100,9 @@ namespace CyberAsm
 		[[nodiscard]] auto Stream() const & noexcept -> const std::vector<std::uint8_t>&;
 		[[nodiscard]] auto Stream() & noexcept -> std::vector<std::uint8_t>&;
 		[[nodiscard]] auto Stream() && noexcept -> std::vector<std::uint8_t>&&;
-
 		[[nodiscard]] auto CurrentEndianness() const noexcept -> Endianness;
 		[[nodiscard]] auto SwitchEndianness() -> Endianness;
+		[[nodiscard]] auto TargetArch() const noexcept -> TargetArchitecture;
 
 		void Reserve(std::size_t size);
 		void Clear();
@@ -113,6 +122,7 @@ namespace CyberAsm
 	private:
 		std::vector<std::uint8_t> stream = {};
 		Endianness endianness = Endianness::Little;
+		TargetArchitecture targetArchitecture = TargetArchitecture::X86_64;
 	};
 
 	extern auto operator <<(std::ostream& out, const MachineStream& stream) -> std::ostream&;

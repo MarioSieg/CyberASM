@@ -5,9 +5,14 @@
 
 namespace CyberAsm
 {
-	MachineStream::MachineStream(std::vector<std::uint8_t>&& vector) noexcept : stream(std::move(vector)) { }
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture) noexcept : targetArchitecture(targetArchitecture)
+	{
 
-	MachineStream::MachineStream(const std::vector<std::byte>& vector)
+	}
+	
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, std::vector<std::uint8_t>&& vector) noexcept : stream(std::move(vector)), targetArchitecture(targetArchitecture) { }
+
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::vector<std::byte>& vector)
 	{
 		this->stream.reserve(vector.size());
 		for (const auto value : vector)
@@ -16,11 +21,11 @@ namespace CyberAsm
 		}
 	}
 
-	MachineStream::MachineStream(const std::uint8_t* const memory, const std::size_t size) : stream(memory, memory + size) { }
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::uint8_t* const memory, const std::size_t size) : stream(memory, memory + size), targetArchitecture(targetArchitecture) { }
 
-	MachineStream::MachineStream(const std::byte* const memory, const std::size_t size) : MachineStream(reinterpret_cast<const std::uint8_t*>(memory), size) { }
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::byte* const memory, const std::size_t size) : MachineStream(targetArchitecture, reinterpret_cast<const std::uint8_t*>(memory), size) { }
 
-	MachineStream::MachineStream(const std::size_t capacity)
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::size_t capacity) : targetArchitecture(targetArchitecture)
 	{
 		stream.reserve(capacity);
 	}
@@ -224,6 +229,12 @@ namespace CyberAsm
 		return *this;
 	}
 
+	auto MachineStream::operator<<(std::bitset<8> byteBits) -> MachineStream&
+	{
+		this->stream.push_back(static_cast<std::uint8_t>(byteBits.to_ulong()));
+		return *this;
+	}
+
 	auto MachineStream::operator<<(const void* const value) -> MachineStream&
 	{
 		this->Insert(value);
@@ -285,6 +296,11 @@ namespace CyberAsm
 	{
 		std::ranges::reverse(this->stream);
 		return this->endianness = this->endianness == Endianness::Little ? Endianness::Big : Endianness::Little;
+	}
+
+	auto MachineStream::TargetArch() const noexcept -> TargetArchitecture
+	{
+		return this->targetArchitecture;
 	}
 
 	void MachineStream::Reserve(const std::size_t size)

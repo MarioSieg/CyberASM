@@ -16,12 +16,13 @@ auto main(const int argc, const char* const* const argv) -> int
 	{
 		auto assemble = [](auto reg, auto val, auto str)
 		{
-			MachineStream out = {};
+			auto machineStream = MachineStream(TargetArchitecture::X86_64);
 			const Operand operands[] = { Operand(reg), Operand(val) };
-			const auto bytes = Encode(out, Instruction::Adc, operands);
-			std::cout << std::left << str << " -> "<< std::right << out;
+			const auto bytes = Encode(machineStream, Instruction::Adc, operands);
+			std::cout << std::left << str << " -> "<< std::right << machineStream;
 		};
 		assemble(Register::Al, Imm8(23), "adcb $23, %al");
+		assemble(Register::Bh, Imm8(23), "adcb $23, %bh");
 		assemble(Register::Ax, Imm16(0x1234), "adcw $0x1234, %ax");
 		assemble(Register::Eax, Imm32(0xFF'AA'FF'00), "adcl $0xFF'AA'FF'00, %eax");
 		assemble(Register::Esi, Imm32(0xFF'AA'FF'00), "adcl $0xFF'AA'FF'00, %esi");

@@ -16,7 +16,7 @@ namespace CyberAsm::X86
 	struct OpCodeData final
 	{
 		std::uint8_t Primary = 0;
-		std::uint8_t Extension = 0;
+		std::optional<std::uint8_t> Extension = 0;
 	};
 
 	struct ImmediateData final
@@ -46,8 +46,8 @@ namespace CyberAsm::X86
 				continue;
 			}
 
-				// Count of valid operands. If it's the same as the total operand count, all are valid!
-				// It's a match <3
+			// Count of valid operands. If it's the same as the total operand count, all are valid!
+			// It's a match <3
 			std::size_t validCount = 0;
 
 			// Max byte size of operands.
@@ -129,8 +129,7 @@ namespace CyberAsm::X86
         const auto instructionIndex = static_cast<std::size_t>(instruction);
         const auto opCode = *(MachineCodeTable[instructionIndex].begin() + variationIndex);
 		const auto extension = *(MachineCodeExtensionTable[instructionIndex].begin() + variationIndex);
-		const auto opCodeEx = static_cast<std::uint8_t>(extension != -1 ? extension : 0);
-		return { opCode, opCodeEx };
+		return { opCode, extension == -1 ? std::nullopt : std::optional<std::uint8_t>(extension) };
     }
 
 	static auto GetImmediate(const std::span<const Operand> operands) noexcept -> std::optional<ImmediateData>
@@ -172,57 +171,50 @@ namespace CyberAsm::X86
 	{
         const auto sizeBackup = operands.size();
 
+		const TargetArchitecture arch = out.TargetArch();
         const InstructionData instr = GetInstructionData(instruction, operands).value();
         const OpCodeData opc = GetOpCodes(instruction, instr.VariationIndex);
 
 		const auto mod = ModBitsRegisterAddressing;
 
-        if (instr.MaxOperandSize == FixedSize::QWord) [[unlikely]]
+		if (arch == TargetArchitecture::X86_64) [[likely]]
 		{
-			out << RexW64;
+			if (instr.MaxOperandSize == FixedSize::QWord) [[likely]]
+			{
+				out << RexW64;
+			}
+			else if (instr.MaxOperandSize == FixedSize::Word) [[likely]]
+			{
+				out << OperandSizeOverride;
+			}
 		}
 
         if (instr.RequiresTwoBytes) [[unlikely]]
 		{
 			out << TwoByteOpCodePrefix;
 		}
-
+		
 		out << opc.Primary;
-
-		if (const auto reg = GetRegisterId(operands); reg && !(*reg).IsImplicit)
+		
+		// <---8bit--->
+		// +--+---+---+
+		// |12|345|678|
+		// +--+---+---+
+		constexpr auto packField = [](const std::uint8_t bits12, const std::uint8_t bits345, const std::uint8_t bits678) noexcept -> std::uint8_t
 		{
-			const auto& unpacked = *reg;
-			const union ModRm
-			{
-				struct
-				{
-					std::uint8_t Rm : 3;
-					std::uint8_t Reg : 3;
-					std::uint8_t Mod : 2;
-				} Bits;
-				std::uint8_t Packed;
-				static_assert(sizeof Bits == 1);
-			} modRm = { .Bits = {.Rm = unpacked.Address, .Reg = opc.Extension, .Mod = mod} };
-			out << modRm.Packed;
+			return static_cast<std::uint8_t>(bits678 & ~0b1111000 | (bits345 & ~0b1111000) << 3 | (bits12 & ~0b11111100) << 6);
+		};
+
+		if (const auto reg = GetRegisterId(operands); reg && !(*reg).IsImplicit) [[likely]]
+		{
+			const auto unpacked = *reg;
+			const auto rmField = unpacked.Address;				// 3 bits
+			const auto regField = opc.Extension.value_or(0);	// 3 bits
+			const auto modField = mod;							// 2 bits
+			out << packField(modField, regField, rmField);
 		}
-
-		const union Sib
-		{
-			struct
-			{
-				std::uint8_t Scale : 2;
-				std::uint8_t Index : 3;
-				std::uint8_t Base : 3;
-			} Bits;
-			std::uint8_t Packed;
-
-			static_assert(sizeof Bits == 1);
-		} sib = { .Bits = {0, 0, 0} };
-
-		if (sib.Packed) [[likely]]
-		{
-			out << sib.Packed;
-		}
+		
+		// TODO: Sib here
     	
 		if (const auto immediateData = GetImmediate(operands); immediateData) [[unlikely]]
 		{
