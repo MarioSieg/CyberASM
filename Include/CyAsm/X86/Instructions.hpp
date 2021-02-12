@@ -62,7 +62,7 @@ namespace CyberAsm::X86
 		std::initializer_list<std::int8_t>{-0x01, -0x01, -0x01, -0x01, -0x01, -0x01, 0x02, 0x02, 0x02}, // adc
 		std::initializer_list<std::int8_t>{-0x01, -0x01, -0x01, -0x01, -0x01, -0x01, 0x00, 0x00, 0x00}, // add
 	};
-	
+
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
 	{
 		"adc",

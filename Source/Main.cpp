@@ -17,9 +17,9 @@ auto main(const int argc, const char* const* const argv) -> int
 		auto assemble = [](auto reg, auto val, auto str)
 		{
 			auto machineStream = MachineStream(TargetArchitecture::X86_64);
-			const Operand operands[] = { Operand(reg), Operand(val) };
+			const Operand operands[] = {Operand(reg), Operand(val)};
 			const auto bytes = Encode(machineStream, Instruction::Adc, operands);
-			std::cout << std::left << str << " -> "<< std::right << machineStream;
+			std::cout << std::left << str << " -> " << std::right << machineStream;
 		};
 		assemble(Register::Al, Imm8(23), "adcb $23, %al");
 		assemble(Register::Bh, Imm8(23), "adcb $23, %bh");

@@ -17,7 +17,7 @@ namespace CyberAsm
 		X86_64,
 		ARM_64
 	};
-	
+
 	/// <summary>
 	/// Represents machine code.
 	/// It uses std::uint8_t as byte type (because a stream byte can be an ASCII character or a value)
@@ -88,7 +88,7 @@ namespace CyberAsm
 		auto operator <<(const std::vector<std::uint8_t>& value) -> MachineStream&;
 		auto operator <<(const std::vector<std::byte>& value) -> MachineStream&;
 		auto operator <<(std::initializer_list<std::uint8_t>&& value) -> MachineStream&;
-		auto operator <<(std::bitset<8> byteBits)->MachineStream&;
+		auto operator <<(std::bitset<8> byteBits) -> MachineStream&;
 		auto operator <<(const void* value) -> MachineStream&;
 
 		auto operator [](std::size_t idx) -> std::uint8_t&;

@@ -5,7 +5,7 @@
 #include "../../Include/CyAsm/X86/MachineLanguage.hpp"
 
 namespace CyberAsm::X86
-{	
+{
 	struct InstructionData final
 	{
 		std::size_t VariationIndex = 0;
@@ -63,25 +63,25 @@ namespace CyberAsm::X86
 				OperandFlags::Flags additionalFlags = OperandFlags::None;
 				switch (givenFlags)
 				{
-					[[unlikely]]
-				case OperandFlags::Reg8Al:
-					additionalFlags = OperandFlags::Reg8;
-					break;
+						[[unlikely]]
+					case OperandFlags::Reg8Al:
+						additionalFlags = OperandFlags::Reg8;
+						break;
 
-					[[unlikely]]
-				case OperandFlags::Reg16Ax:
-					additionalFlags = OperandFlags::Reg16;
-					break;
+						[[unlikely]]
+					case OperandFlags::Reg16Ax:
+						additionalFlags = OperandFlags::Reg16;
+						break;
 
-					[[likely]]
-				case OperandFlags::Reg32Eax:
-					additionalFlags = OperandFlags::Reg32;
-					break;
+						[[likely]]
+					case OperandFlags::Reg32Eax:
+						additionalFlags = OperandFlags::Reg32;
+						break;
 
-					[[likely]]
-				case OperandFlags::Reg64Rax:
-					additionalFlags = OperandFlags::Reg64;
-					break;
+						[[likely]]
+					case OperandFlags::Reg64Rax:
+						additionalFlags = OperandFlags::Reg64;
+						break;
 				}
 				givenFlags |= additionalFlags;
 
@@ -109,45 +109,47 @@ namespace CyberAsm::X86
 
 		throw std::runtime_error("no matching instruction found!");
 	}
-	
-    static auto GetInstructionData(const Instruction instruction, const std::span<const Operand> operands) -> std::optional<InstructionData>
-    {
-        const auto instructionIndex = static_cast<std::size_t>(instruction);
-        const auto variation = DetermineInstructionVariation(instruction, operands);
-        const auto variationIndex = std::get<0>(variation);
+
+	static auto GetInstructionData(const Instruction instruction, const std::span<const Operand> operands) -> std::optional<InstructionData>
+	{
+		const auto instructionIndex = static_cast<std::size_t>(instruction);
+		const auto variation = DetermineInstructionVariation(instruction, operands);
+		const auto variationIndex = std::get<0>(variation);
 		const auto maxOpSize = std::get<1>(variation);
 		const auto twoByte = TwoByteOpCodeTable[instructionIndex];
 		if (variationIndex >= MachineCodeTable[instructionIndex].size() || static_cast<std::uint8_t>(maxOpSize) > static_cast<std::uint8_t>(FixedSize::QWord)) [[unlikely]]
 		{
 			return std::nullopt;
-        }
-		return { { variationIndex, twoByte, maxOpSize } };
-    }
+		}
+		return {{variationIndex, twoByte, maxOpSize}};
+	}
 
-    static inline auto GetOpCodes(const Instruction instruction, const std::size_t variationIndex) -> OpCodeData
-    {
-        const auto instructionIndex = static_cast<std::size_t>(instruction);
-        const auto opCode = *(MachineCodeTable[instructionIndex].begin() + variationIndex);
+	static inline auto GetOpCodes(const Instruction instruction, const std::size_t variationIndex) -> OpCodeData
+	{
+		const auto instructionIndex = static_cast<std::size_t>(instruction);
+		const auto opCode = *(MachineCodeTable[instructionIndex].begin() + variationIndex);
 		const auto extension = *(MachineCodeExtensionTable[instructionIndex].begin() + variationIndex);
-		return { opCode, extension == -1 ? std::nullopt : std::optional<std::uint8_t>(extension) };
-    }
+		return {opCode, extension == -1 ? std::nullopt : std::optional<std::uint8_t>(extension)};
+	}
 
 	static auto GetImmediate(const std::span<const Operand> operands) noexcept -> std::optional<ImmediateData>
-    {
-	    for(const auto& operand : operands)
-	    {
+	{
+		for (const auto& operand : operands)
+		{
 			if (operand.IsImmediate()) [[unlikely]]
 			{
 				return
-				{{
-					operand.Unwrap().Imm32.Value,
-					operand.OperandByteSize()
-				}};
+				{
+					{
+						operand.Unwrap().Imm32.Value,
+						operand.OperandByteSize()
+					}
+				};
 
-		    }
-	    }
+			}
+		}
 		return std::nullopt;
-    }
+	}
 
 	static auto GetRegisterId(const std::span<const Operand> operands) noexcept -> std::optional<RegisterData>
 	{
@@ -157,11 +159,13 @@ namespace CyberAsm::X86
 			{
 				const auto index = static_cast<std::size_t>(operand.Unwrap().Register);
 				return
-				{{
-					RegisterIdTable[index],
-					operand.IsImplicitRegister(),
-					operand.OperandByteSize()
-				}};
+				{
+					{
+						RegisterIdTable[index],
+						operand.IsImplicitRegister(),
+						operand.OperandByteSize()
+					}
+				};
 			}
 		}
 		return std::nullopt;
@@ -169,11 +173,11 @@ namespace CyberAsm::X86
 
 	auto Encode(MachineStream& out, const Instruction instruction, const std::span<const Operand> operands) -> std::size_t
 	{
-        const auto sizeBackup = operands.size();
+		const auto sizeBackup = operands.size();
 
 		const TargetArchitecture arch = out.TargetArch();
-        const InstructionData instr = GetInstructionData(instruction, operands).value();
-        const OpCodeData opc = GetOpCodes(instruction, instr.VariationIndex);
+		const InstructionData instr = GetInstructionData(instruction, operands).value();
+		const OpCodeData opc = GetOpCodes(instruction, instr.VariationIndex);
 
 		const auto mod = ModBitsRegisterAddressing;
 
@@ -189,13 +193,13 @@ namespace CyberAsm::X86
 			}
 		}
 
-        if (instr.RequiresTwoBytes) [[unlikely]]
+		if (instr.RequiresTwoBytes) [[unlikely]]
 		{
 			out << TwoByteOpCodePrefix;
 		}
-		
+
 		out << opc.Primary;
-		
+
 		// <---8bit--->
 		// +--+---+---+
 		// |12|345|678|
@@ -208,14 +212,14 @@ namespace CyberAsm::X86
 		if (const auto reg = GetRegisterId(operands); reg && !(*reg).IsImplicit) [[likely]]
 		{
 			const auto unpacked = *reg;
-			const auto rmField = unpacked.Address;				// 3 bits
-			const auto regField = opc.Extension.value_or(0);	// 3 bits
-			const auto modField = mod;							// 2 bits
+			const auto rmField = unpacked.Address; // 3 bits
+			const auto regField = opc.Extension.value_or(0); // 3 bits
+			const auto modField = mod; // 2 bits
 			out << packField(modField, regField, rmField);
 		}
-		
+
 		// TODO: Sib here
-    	
+
 		if (const auto immediateData = GetImmediate(operands); immediateData) [[unlikely]]
 		{
 			const auto& unpacked = *immediateData;
@@ -223,8 +227,8 @@ namespace CyberAsm::X86
 			{
 				out << static_cast<std::uint8_t>(unpacked.Value >> i * 8 & 0xFF);
 			}
-    	}
+		}
 
-        return operands.size() - sizeBackup;
+		return operands.size() - sizeBackup;
 	}
 }

@@ -5,11 +5,8 @@
 
 namespace CyberAsm
 {
-	MachineStream::MachineStream(const TargetArchitecture targetArchitecture) noexcept : targetArchitecture(targetArchitecture)
-	{
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture) noexcept : targetArchitecture(targetArchitecture) { }
 
-	}
-	
 	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, std::vector<std::uint8_t>&& vector) noexcept : stream(std::move(vector)), targetArchitecture(targetArchitecture) { }
 
 	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::vector<std::byte>& vector)
@@ -21,9 +18,11 @@ namespace CyberAsm
 		}
 	}
 
-	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::uint8_t* const memory, const std::size_t size) : stream(memory, memory + size), targetArchitecture(targetArchitecture) { }
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::uint8_t* const memory, const std::size_t size) : stream(memory, memory + size),
+		targetArchitecture(targetArchitecture) { }
 
-	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::byte* const memory, const std::size_t size) : MachineStream(targetArchitecture, reinterpret_cast<const std::uint8_t*>(memory), size) { }
+	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::byte* const memory, const std::size_t size) : MachineStream(
+		targetArchitecture, reinterpret_cast<const std::uint8_t*>(memory), size) { }
 
 	MachineStream::MachineStream(const TargetArchitecture targetArchitecture, const std::size_t capacity) : targetArchitecture(targetArchitecture)
 	{
