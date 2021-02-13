@@ -39,10 +39,10 @@ namespace CyberAsm::X86
 	{
 		std::uint8_t rex = 0b00000100;
 		rex <<= 4U;
-		rex ^= (-b ^ rex) & 1U << 0U;
-		rex ^= (-x ^ rex) & 1U << 1U;
-		rex ^= (-r ^ rex) & 1U << 2U;
-		rex ^= (-w ^ rex) & 1U << 3U;
+		rex ^= (-static_cast<std::uint8_t>(b) ^ rex) & 1U << 0U;
+		rex ^= (-static_cast<std::uint8_t>(x) ^ rex) & 1U << 1U;
+		rex ^= (-static_cast<std::uint8_t>(r) ^ rex) & 1U << 2U;
+		rex ^= (-static_cast<std::uint8_t>(w) ^ rex) & 1U << 3U;
 		return rex;
 	}
 

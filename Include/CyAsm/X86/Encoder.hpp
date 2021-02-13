@@ -114,22 +114,22 @@ namespace CyberAsm::X86
 				OperandFlags::Flags additionalFlags = OperandFlags::None;
 				switch (givenFlags)
 				{
-						[[unlikely]]
+					[[unlikely]]
 					case OperandFlags::Reg8Al:
 						additionalFlags = OperandFlags::Reg8;
 						break;
 
-						[[unlikely]]
+					[[unlikely]]
 					case OperandFlags::Reg16Ax:
 						additionalFlags = OperandFlags::Reg16;
 						break;
 
-						[[likely]]
+					[[likely]]
 					case OperandFlags::Reg32Eax:
 						additionalFlags = OperandFlags::Reg32;
 						break;
 
-						[[likely]]
+					[[likely]]
 					case OperandFlags::Reg64Rax:
 						additionalFlags = OperandFlags::Reg64;
 						break;
@@ -148,8 +148,8 @@ namespace CyberAsm::X86
 				}
 			}
 
-			// If all operands are the same, it's a match <3
-			// So we return the index in the variation list:
+			// If all operands are the same
+			// we return the index in the variation list:
 			if (validCount == flagList.size()) [[unlikely]]
 			{
 				// Compute the index by the pointer difference between the current item and the start pointer.
