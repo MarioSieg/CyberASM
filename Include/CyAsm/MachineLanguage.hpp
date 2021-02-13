@@ -3,11 +3,16 @@
 #include <array>
 #include <algorithm>
 
-
-#include "X86/Instructions.hpp"
-
 namespace CyberAsm
 {
+	enum class TargetArchitecture
+	{
+		X86_16,
+		X86_32,
+		X86_64,
+		ARM_64
+	};
+
 	/// <summary>
 	/// Represents an endianness.
 	/// Big-Endian = most significant byte is stored at the smallest memory address

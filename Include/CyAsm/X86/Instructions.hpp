@@ -2,14 +2,8 @@
 
 #include <cstdint>
 #include <array>
-#include <bitset>
 
 #include "OperandFlags.hpp"
-
-namespace CyberAsm
-{
-	class MachineStream;
-}
 
 namespace CyberAsm::X86
 {
@@ -73,6 +67,8 @@ namespace CyberAsm::X86
 	{
 		false, false
 	};
+
+	constexpr std::size_t MaxInstructionBytes = 16;
 
 	consteval auto ValidateTables() noexcept -> bool
 	{

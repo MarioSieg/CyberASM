@@ -8,6 +8,7 @@
 
 namespace CyberAsm
 {
+	template <TargetArchitecture>
 	class MachineStream;
 
 	namespace X86
