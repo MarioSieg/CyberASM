@@ -181,11 +181,35 @@ namespace CyberAsm::X86
 
 		const auto mod = ModBitsRegisterAddressing;
 
+        // <-------------8bit-------------->
+        // +---+---+---+---+---+---+---+---+
+        // | 0   1   0   0 | W | R | X | B |
+        // +---+---+---+---+---+---+---+---+
+        constexpr auto packRexPrefix = [](const bool w, const bool r = false, const bool x = false, const bool b = false) noexcept -> std::uint8_t
+        {
+            std::uint8_t rex = RexBitPattern;
+            rex <<= 4U;
+            rex ^= (-b ^ rex) & (1U << 0U);
+            rex ^= (-x ^ rex) & (1U << 1U);
+            rex ^= (-r ^ rex) & (1U << 2U);
+            rex ^= (-w ^ rex) & (1U << 3U);
+            return rex;
+        };
+
+        // <---8bit--->
+        // +--+---+---+
+        // |12|345|678|
+        // +--+---+---+
+        constexpr auto packField = [](const std::uint8_t bits12, const std::uint8_t bits345, const std::uint8_t bits678) noexcept -> std::uint8_t
+        {
+            return static_cast<std::uint8_t>(bits678 & ~0b1111000U | (bits345 & ~0b1111000U) << 3U | (bits12 & ~0b11111100U) << 6U);
+        };
+
 		if (arch == TargetArchitecture::X86_64) [[likely]]
 		{
 			if (instr.MaxOperandSize == FixedSize::QWord) [[likely]]
-			{
-				out << RexW64;
+            {
+                out << RexW64;
 			}
 			else if (instr.MaxOperandSize == FixedSize::Word) [[likely]]
 			{
@@ -199,15 +223,6 @@ namespace CyberAsm::X86
 		}
 
 		out << opc.Primary;
-
-		// <---8bit--->
-		// +--+---+---+
-		// |12|345|678|
-		// +--+---+---+
-		constexpr auto packField = [](const std::uint8_t bits12, const std::uint8_t bits345, const std::uint8_t bits678) noexcept -> std::uint8_t
-		{
-			return static_cast<std::uint8_t>(bits678 & ~0b1111000 | (bits345 & ~0b1111000) << 3 | (bits12 & ~0b11111100) << 6);
-		};
 
 		if (const auto reg = GetRegisterId(operands); reg && !(*reg).IsImplicit) [[likely]]
 		{

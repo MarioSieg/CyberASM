@@ -15,10 +15,11 @@ namespace CyberAsm::X86
 	constexpr std::uint8_t SegmentOverrideEs					= 0x26;
 	constexpr std::uint8_t SegmentOverrideFs					= 0x64;
 	constexpr std::uint8_t SegmentOverrideGs					= 0x65;
-	constexpr std::uint8_t RexW64								= 0x48;
+    constexpr std::uint8_t RexW64								= 0x48;
 	constexpr std::uint8_t OperandSizeOverride					= 0x66;
 	constexpr std::uint8_t AddressSizeOverride					= 0x67;
-	constexpr std::uint8_t TwoByteOpCodePrefix					= 0x0F;
+    constexpr std::uint8_t TwoByteOpCodePrefix					= 0x0F;
+    constexpr std::uint8_t RexBitPattern                        = 0b00000100;
 	constexpr std::uint8_t ModBitsRegisterIndirect				= 0b00000000;
 	constexpr std::uint8_t ModBitsOneByteSignedDisplace			= 0b00000001;
 	constexpr std::uint8_t ModBitsFourByteSignedDisplace		= 0b00000010;
