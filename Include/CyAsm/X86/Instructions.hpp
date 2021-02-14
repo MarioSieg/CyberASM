@@ -45,16 +45,16 @@ namespace CyberAsm::X86
 		}
 	};
 
-	constexpr std::array<std::initializer_list<std::uint8_t>, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
+	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{
-		std::initializer_list<std::uint8_t>{0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x80, 0x81, 0x83}, // adc
-		std::initializer_list<std::uint8_t>{0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x80, 0x81, 0x83}, // add
+		u8"\x10\x11\x12\x13\x14\x15\x80\x81\x83"_mach, // adc
+		u8"\x00\x01\x02\x03\x04\x05\x80\x81\x83"_mach, // add
 	};
 
-	constexpr std::array<std::initializer_list<std::int8_t>, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
+	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
 	{
-		std::initializer_list<std::int8_t>{-0x01, -0x01, -0x01, -0x01, -0x01, -0x01, 0x02, 0x02, 0x02}, // adc
-		std::initializer_list<std::int8_t>{-0x01, -0x01, -0x01, -0x01, -0x01, -0x01, 0x00, 0x00, 0x00}, // add
+		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x02\x02\x02"_mach, // adc
+		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00"_mach, // add
 	};
 
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
@@ -74,7 +74,7 @@ namespace CyberAsm::X86
 	{
 		for (std::size_t i = 0; i < static_cast<std::size_t>(Instruction::Count); ++i)
 		{
-			if (OperandTable[i].size() != MachineCodeTable[i].size() || MachineCodeTable[i].size() != MachineCodeExtensionTable[i].size()) [[unlikely]]
+			if (MachineCodeTable[i].size() != MachineCodeExtensionTable[i].size()) [[unlikely]]
 			{
 				return false;
 			}

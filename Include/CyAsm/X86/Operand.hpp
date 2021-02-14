@@ -31,7 +31,7 @@ namespace CyberAsm
 
 			[[nodiscard]] constexpr auto Unwrap() const noexcept -> const OperandData&;
 			[[nodiscard]] constexpr auto Flags() const noexcept -> OperandFlags::Flags;
-			[[nodiscard]] constexpr auto IsRegister() const noexcept -> bool;
+			[[nodiscard]] constexpr auto IsExplicitRegister() const noexcept -> bool;
 			[[nodiscard]] constexpr auto IsImplicitRegister() const noexcept -> bool;
 			[[nodiscard]] constexpr auto IsImmediate() const noexcept -> bool;
 			[[nodiscard]] constexpr auto IsMemory() const noexcept -> bool;
@@ -111,9 +111,9 @@ namespace CyberAsm
 			return this->flags;
 		}
 
-		constexpr auto Operand::IsRegister() const noexcept -> bool
+		constexpr auto Operand::IsExplicitRegister() const noexcept -> bool
 		{
-			return OperandFlags::IsRegister(this->flags);
+			return OperandFlags::IsExplicitRegister(this->flags);
 		}
 
 		constexpr auto Operand::IsImplicitRegister() const noexcept -> bool

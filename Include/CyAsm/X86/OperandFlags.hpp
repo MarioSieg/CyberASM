@@ -47,14 +47,14 @@ namespace CyberAsm::X86
 
 		using Flags = std::underlying_type<Enum>::type;
 
-		[[nodiscard]] static constexpr auto IsRegister(Flags flags) noexcept -> bool;
+		[[nodiscard]] static constexpr auto IsExplicitRegister(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto IsImplicitRegister(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto IsImmediate(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto IsMemory(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto OperandByteSize(Flags flags) noexcept -> FixedSize;
 	};
 
-	constexpr auto OperandFlags::IsRegister(const Flags flags) noexcept -> bool
+	constexpr auto OperandFlags::IsExplicitRegister(const Flags flags) noexcept -> bool
 	{
 		return flags > 0 && flags <= Reg64Rax;
 	}

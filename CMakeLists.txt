@@ -10,4 +10,4 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
 
 message("${CMAKE_CXX_FLAGS}")
 
-add_executable("cyberasm" "Source/Main.cpp")
+add_executable("cyberasm" "Source/Main.cpp" "Include/CyAsm/Result.hpp")

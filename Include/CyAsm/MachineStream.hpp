@@ -1,6 +1,7 @@
 #pragma once
 
 #include <filesystem>
+#include <execution>
 #include <optional>
 #include <string>
 #include <fstream>
@@ -38,7 +39,7 @@ namespace CyberAsm
 		auto operator=(const MachineStream&) -> MachineStream& = default;
 		auto operator=(MachineStream&&) noexcept -> MachineStream& = default;
 
-		virtual ~MachineStream() = default;
+		~MachineStream() = default;
 
 		template <typename T> requires std::is_trivial_v<T>
 		auto Insert(T value) -> std::vector<std::uint8_t>&;

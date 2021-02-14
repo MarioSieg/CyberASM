@@ -4,6 +4,7 @@
 #include <optional>
 #include <array>
 
+#include "../Result.hpp"
 #include "Instructions.hpp"
 #include "MachineLanguage.hpp"
 #include "Operand.hpp"
@@ -39,9 +40,9 @@ namespace CyberAsm::X86
 	constexpr auto GetOpCodes(const Instruction instruction, const std::size_t variationIndex) -> OpCodeData
 	{
 		const auto instructionIndex = static_cast<std::size_t>(instruction);
-		const auto opCode = *(MachineCodeTable[instructionIndex].begin() + variationIndex);
-		const auto extension = *(MachineCodeExtensionTable[instructionIndex].begin() + variationIndex);
-		return {opCode, extension == -1 ? std::nullopt : std::optional<std::uint8_t>(extension)};
+		const char8_t opCode = MachineCodeTable[instructionIndex][variationIndex];
+		const char8_t extension = MachineCodeExtensionTable[instructionIndex][variationIndex];
+		return {opCode, extension == u8'\xFF' ? std::nullopt : std::optional<std::uint8_t>(extension)};
 	}
 
 	constexpr auto GetImmediate(const std::span<const Operand> operands) noexcept -> std::optional<ImmediateData>
@@ -63,132 +64,152 @@ namespace CyberAsm::X86
 		return std::nullopt;
 	}
 
-	constexpr auto GetRegisterId(const std::span<const Operand> operands) noexcept -> std::optional<RegisterData>
+	constexpr auto GetRegisters(std::array<RegisterData, 3>& out, const std::span<const Operand> operands) noexcept -> std::size_t
 	{
-		for (const auto& operand : operands)
+		std::size_t needle = 0;
+		for (std::size_t i = 0; i < out.size() && i < operands.size(); ++i)
 		{
-			if (operand.IsRegister()) [[likely]]
+			const auto& operand = operands[i];
+			if (operand.IsExplicitRegister()) [[likely]]
 			{
 				const auto index = static_cast<std::size_t>(operand.Unwrap().Register);
-				return
+				out[needle++] =
 				{
-					{
-						RegisterIdTable[index],
-						operand.IsImplicitRegister(),
-						operand.OperandByteSize()
-					}
+					RegisterIdTable[index],
+					operand.IsImplicitRegister(),
+					operand.OperandByteSize()
 				};
 			}
 		}
-		return std::nullopt;
+		return needle;
 	}
 
-	constexpr auto DetermineInstructionVariation(const Instruction instruction, const std::span<const Operand> operands) -> std::optional<std::tuple<std::size_t, FixedSize>>
+	constexpr auto GetInstructionData(InstructionData& out, const Instruction instruction, const std::span<const Operand> operands) -> Result
 	{
-		// The index of the instruction for all the lookup tables.
-		const auto index = static_cast<std::size_t>(instruction);
-
-		// Search for each instruction variation for the specified index.
-		for (const std::initializer_list<OperandFlags::Flags>& flagList : OperandTable[index])
+		auto determineInstructionVariation = [=](std::size_t& needle, FixedSize& size) -> Result
 		{
-			// If the operand count does not match, it won't work. Search the next one.
-			if (flagList.size() != operands.size()) [[unlikely]]
+			// The index of the instruction for all the lookup tables.
+			const auto index = static_cast<std::size_t>(instruction);
+
+			// Search for each instruction variation for the specified index.
+			for (const std::initializer_list<OperandFlags::Flags>& flagList : OperandTable[index])
 			{
-				continue;
-			}
-
-			// Count of valid operands. If it's the same as the total operand count, all are valid!
-			// It's a match <3
-			std::size_t validCount = 0;
-
-			// Max byte size of operands.
-			auto opSize = FixedSize::Byte;
-
-			// Compare each passed operand flag with the variation.
-			for (std::size_t j = 0; j < flagList.size(); ++j)
-			{
-				// The passed operand flags:
-				OperandFlags::Flags givenFlags = operands[j].Flags();
-
-				// If we have implicit registers, we need to add extra register flags, because the implicit registers are included.
-				OperandFlags::Flags additionalFlags = OperandFlags::None;
-				switch (givenFlags)
+				// If the operand count does not match, it won't work. Search the next one.
+				if (flagList.size() != operands.size()) [[unlikely]]
 				{
-					[[unlikely]]
-					case OperandFlags::Reg8Al:
-						additionalFlags = OperandFlags::Reg8;
-						break;
-
-					[[unlikely]]
-					case OperandFlags::Reg16Ax:
-						additionalFlags = OperandFlags::Reg16;
-						break;
-
-					[[likely]]
-					case OperandFlags::Reg32Eax:
-						additionalFlags = OperandFlags::Reg32;
-						break;
-
-					[[likely]]
-					case OperandFlags::Reg64Rax:
-						additionalFlags = OperandFlags::Reg64;
-						break;
+					continue;
 				}
-				givenFlags |= additionalFlags;
 
-				// The given flags which are required by the instruction.
-				const OperandFlags::Flags required = *(flagList.begin() + j);
+				// Count of valid operands. If it's the same as the total operand count, all are valid!
+				// It's a match <3
+				std::size_t validCount = 0;
 
-				// If the operand flags are set inside the given flag, increment the valid counter and add the operand size.
-				if (required & givenFlags) [[unlikely]]
+				// Max byte size of operands.
+				auto opSize = FixedSize::Byte;
+
+				// Compare each passed operand flag with the variation.
+				for (std::size_t j = 0; j < flagList.size(); ++j)
 				{
-					++validCount;
-					const auto x = OperandFlags::OperandByteSize(givenFlags);
-					opSize = static_cast<FixedSize>(std::max(static_cast<std::uint8_t>(opSize), static_cast<std::uint8_t>(x)));
+					// The passed operand flags:
+					OperandFlags::Flags givenFlags = operands[j].Flags();
+
+					// If we have implicit registers, we need to add extra register flags, because the implicit registers are included.
+					OperandFlags::Flags additionalFlags = OperandFlags::None;
+					switch (givenFlags)
+					{
+							[[unlikely]]
+						case OperandFlags::Reg8Al:
+							additionalFlags = OperandFlags::Reg8;
+							break;
+
+							[[unlikely]]
+						case OperandFlags::Reg16Ax:
+							additionalFlags = OperandFlags::Reg16;
+							break;
+
+							[[likely]]
+						case OperandFlags::Reg32Eax:
+							additionalFlags = OperandFlags::Reg32;
+							break;
+
+							[[likely]]
+						case OperandFlags::Reg64Rax:
+							additionalFlags = OperandFlags::Reg64;
+							break;
+					}
+					givenFlags |= additionalFlags;
+
+					// The given flags which are required by the instruction.
+					const OperandFlags::Flags required = *(flagList.begin() + j);
+
+					// If the operand flags are set inside the given flag, increment the valid counter and add the operand size.
+					if (required & givenFlags) [[unlikely]]
+					{
+						++validCount;
+						const auto x = OperandFlags::OperandByteSize(givenFlags);
+						opSize = static_cast<FixedSize>(std::max(static_cast<std::uint8_t>(opSize), static_cast<std::uint8_t>(x)));
+					}
+				}
+
+				// If all operands are the same
+				// we return the index in the variation list:
+				if (validCount == flagList.size()) [[unlikely]]
+				{
+					// Compute the index by the pointer difference between the current item and the start pointer.
+					const auto diff = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(&flagList - OperandTable[index].begin()));
+					needle = diff;
+					size = opSize;
+					return Result::Ok;
 				}
 			}
 
-			// If all operands are the same
-			// we return the index in the variation list:
-			if (validCount == flagList.size()) [[unlikely]]
-			{
-				// Compute the index by the pointer difference between the current item and the start pointer.
-				const auto diff = static_cast<std::size_t>(static_cast<std::ptrdiff_t>(&flagList - OperandTable[index].begin()));
-				return {std::make_tuple(diff, opSize)};
-			}
-		}
+			return Result::NoInstructionVariationFound;
+		};
 
-		return std::nullopt;
-	}
-
-	constexpr auto GetInstructionData(const Instruction instruction, const std::span<const Operand> operands) -> std::optional<InstructionData>
-	{
 		const auto instructionIndex = static_cast<std::size_t>(instruction);
-		const auto variation = DetermineInstructionVariation(instruction, operands);
-		const auto variationIndex = std::get<0>(variation.value());
-		const auto maxOpSize = std::get<1>(variation.value());
-		const auto twoByte = TwoByteOpCodeTable[instructionIndex];
-		if (variationIndex >= MachineCodeTable[instructionIndex].size() || static_cast<std::uint8_t>(maxOpSize) > static_cast<std::uint8_t>(FixedSize::QWord)) [[unlikely]]
+		std::size_t variationIndex = 0;
+		auto maxOpSize = FixedSize::Byte;
+		if (const auto result = determineInstructionVariation(variationIndex, maxOpSize); result != Result::Ok) [[unlikely]]
 		{
-			return std::nullopt;
+			return result;
 		}
-		return {{variationIndex, twoByte, maxOpSize}};
+		const auto twoByte = TwoByteOpCodeTable[instructionIndex];
+		out = {variationIndex, twoByte, maxOpSize};
+		return Result::Ok;
 	}
 
-	template <typename... T>
-	[[nodiscard]] constexpr auto VariadicArrayConstruct(T&&... values) -> decltype(auto)
+	constexpr auto ValidateOperands(const std::span<const Operand> operands) noexcept -> Result
 	{
-		return std::array<std::decay_t<std::common_type_t<T...>>, sizeof...(T)>{std::forward(values)...};
+		std::size_t immOps = 0, memOps = 0;
+		for (const auto op : operands)
+		{
+			if (op.IsImmediate()) [[unlikely]]
+			{
+				++immOps;
+			}
+			if (op.IsMemory()) [[unlikely]]
+			{
+				++memOps;
+			}
+		}
+		return immOps == operands.size() ? Result::ImmediateToImmediateOperands : memOps == operands.size() ? Result::MemoryToMemoryOperands : Result::Ok;
 	}
 
 	template <TargetArchitecture Arch>
-	constexpr auto Encode(std::span<std::uint8_t>&& out, std::size_t& needle, const Instruction instruction, const std::span<const Operand> operands) -> std::size_t
+	[[nodiscard]] constexpr auto Encode(std::span<std::uint8_t>&& out, std::size_t& needle, const Instruction instruction, const std::span<const Operand> operands) -> Result
 	{
-		const auto sizeBackup = operands.size();
+		if (const auto result = ValidateOperands(operands); result != Result::Ok) [[unlikely]]
+		{
+			return result;
+		}
 
-		const InstructionData instr = GetInstructionData(instruction, operands).value();
+		InstructionData instr;
+		if (const auto result = GetInstructionData(instr, instruction, operands); result != Result::Ok) [[unlikely]]
+		{
+			return result;
+		}
+
 		const OpCodeData opc = GetOpCodes(instruction, instr.VariationIndex);
-
 		const auto mod = ModBitsRegisterAddressing;
 
 		if constexpr (Arch == TargetArchitecture::X86_64) [[likely]]
@@ -210,14 +231,18 @@ namespace CyberAsm::X86
 
 		out[needle++] = opc.Primary;
 
-		if (const auto reg = GetRegisterId(operands); reg && !(*reg).IsImplicit) [[likely]]
+		std::array<RegisterData, 3> registerOperands = {};
+		const auto registerCount = GetRegisters(registerOperands, operands);
+
+		if (registerCount == 0) [[unlikely]]
 		{
-			const auto unpacked = *reg;
-			const auto rmField = unpacked.Address; // 3 bits
-			const auto regField = opc.Extension.value_or(0); // 3 bits
-			const auto modField = mod; // 2 bits
-			out[needle++] = PackByte233(modField, regField, rmField);
+			return Result::MemoryToMemoryOperands;
 		}
+
+		const std::uint8_t rmField = registerOperands[0].IsImplicit ? 0 : registerOperands[0].Address;             // 3 bits
+		const std::uint8_t regField = opc.Extension.value_or(registerCount > 1 ? registerOperands[1].Address : 0); // 3 bits
+		const std::uint8_t modField = mod;                                                                         // 2 bits
+		out[needle++] = PackByteBits233(modField, regField, rmField);
 
 		// TODO: Sib here
 
@@ -230,18 +255,19 @@ namespace CyberAsm::X86
 			}
 		}
 
-		return operands.size() - sizeBackup;
+		return Result::Ok;
 	}
 
-
 	template <TargetArchitecture Arch>
-	inline auto Encode(std::vector<std::uint8_t>& out, const Instruction instruction, const std::span<const Operand> operands) -> std::size_t
+	[[nodiscard]] inline auto Encode(std::vector<std::uint8_t>& out, const Instruction instruction, const std::span<const Operand> operands) -> Result
 	{
 		std::array<std::uint8_t, MaxInstructionBytes> temp = {};
-		auto&& view = std::span<std::uint8_t>(temp.begin(), temp.end());
 		std::size_t needle = 0;
-		Encode<Arch>(std::move(view), needle, instruction, operands);
+		if (const auto result = Encode<Arch>(std::span<std::uint8_t>(temp.begin(), temp.end()), needle, instruction, operands); result != Result::Ok) [[unlikely]]
+		{
+			return result;
+		}
 		out.insert(out.end(), temp.begin(), temp.begin() + needle);
-		return needle;
+		return Result::Ok;
 	}
 }

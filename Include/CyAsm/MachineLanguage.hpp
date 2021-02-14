@@ -13,6 +13,29 @@ namespace CyberAsm
 		ARM_64
 	};
 
+	constexpr auto operator""_mach(const char8_t* const str, const std::size_t count) -> std::u8string_view
+	{
+		return {str, count};
+	}
+
+	template <typename... T>
+	[[nodiscard]] constexpr auto VariadicArrayConstruct(T&&... values) -> decltype(auto)
+	{
+		return std::array<std::decay_t<std::common_type_t<T...>>, sizeof...(T)>{std::forward(values)...};
+	}
+
+	template <typename T, std::size_t... N>
+	[[nodiscard]] constexpr auto EndianSwapImpl(T&& x, std::index_sequence<N...>) -> T
+	{
+		return (((x >> N * CHAR_BIT & 0xFFU) << (sizeof(T) - N - 1U) * CHAR_BIT) | ...);
+	}
+
+	template <typename T, typename U = std::make_unsigned_t<T>>
+	[[nodiscard]] constexpr auto EndianSwap(T&& x) -> U
+	{
+		return EndianSwapImpl<U>(x, std::make_index_sequence<sizeof(T)>{});
+	}
+
 	/// <summary>
 	/// Represents an endianness.
 	/// Big-Endian = most significant byte is stored at the smallest memory address
@@ -23,6 +46,7 @@ namespace CyberAsm
 		Little,
 		Big
 	};
+
 
 	/// <summary>
 	/// Converts a trivial object into a byte array.

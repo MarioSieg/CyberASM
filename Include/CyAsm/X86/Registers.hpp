@@ -356,7 +356,7 @@ namespace CyberAsm::X86
 		32, // ymm12
 		32, // ymm13
 		32, // ymm14
-		32 // ymm15
+		32  // ymm15
 	};
 
 	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterIdTable =
