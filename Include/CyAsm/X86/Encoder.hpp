@@ -244,10 +244,13 @@ namespace CyberAsm::X86
 			return Result::MemoryToMemoryOperands;
 		}
 
-		const std::uint8_t rmField = registerOperands[0].IsImplicit ? 0 : registerOperands[0].Address;             // 3 bits
-		const std::uint8_t regField = opc.Extension.value_or(registerCount > 1 ? registerOperands[1].Address : 0); // 3 bits
-		const std::uint8_t modField = mod;                                                                         // 2 bits
-		put(PackByteBits233(modField, regField, rmField));
+		if (registerCount > 1 || !registerOperands[0].IsImplicit)
+		{
+			const std::uint8_t rmField = registerOperands[0].IsImplicit ? 0 : registerOperands[0].Address;             // 3 bits
+			const std::uint8_t regField = opc.Extension.value_or(registerCount > 1 ? registerOperands[1].Address : 0); // 3 bits
+			const std::uint8_t modField = mod;                                                                         // 2 bits
+			put(PackByteBits233(modField, regField, rmField));
+		}
 
 		// TODO: Sib here
 
