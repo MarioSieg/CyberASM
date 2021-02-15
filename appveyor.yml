@@ -9,4 +9,4 @@ configuration:
 
 build:
   verbosity: normal
--cmd: cmake --build . --target CyberAsm CyberAsmTests
+- cmd: cmake --build . --target CyberAsm CyberAsmTests
