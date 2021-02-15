@@ -198,6 +198,11 @@ namespace CyberAsm::X86
 	template <TargetArchitecture Arch>
 	[[nodiscard]] constexpr auto Encode(std::span<std::uint8_t>&& out, std::size_t& needle, const Instruction instruction, const std::span<const Operand> operands) -> Result
 	{
+		auto put = [&out, &needle](const std::uint8_t value) -> auto&
+		{
+			return out[needle++] = value;
+		};
+
 		if (const auto result = ValidateOperands(operands); result != Result::Ok) [[unlikely]]
 		{
 			return result;
@@ -216,20 +221,20 @@ namespace CyberAsm::X86
 		{
 			if (instr.MaxOperandSize == FixedSize::QWord) [[likely]]
 			{
-				out[needle++] = RexW64;
+				put(RexW64);
 			}
 			else if (instr.MaxOperandSize == FixedSize::Word) [[likely]]
 			{
-				out[needle++] = OperandSizeOverride;
+				put(OperandSizeOverride);
 			}
 		}
 
 		if (instr.RequiresTwoBytes) [[unlikely]]
 		{
-			out[needle++] = TwoByteOpCodePrefix;
+			put(TwoByteOpCodePrefix);
 		}
 
-		out[needle++] = opc.Primary;
+		put(opc.Primary);
 
 		std::array<RegisterData, 3> registerOperands = {};
 		const auto registerCount = GetRegisters(registerOperands, operands);
@@ -242,7 +247,7 @@ namespace CyberAsm::X86
 		const std::uint8_t rmField = registerOperands[0].IsImplicit ? 0 : registerOperands[0].Address;             // 3 bits
 		const std::uint8_t regField = opc.Extension.value_or(registerCount > 1 ? registerOperands[1].Address : 0); // 3 bits
 		const std::uint8_t modField = mod;                                                                         // 2 bits
-		out[needle++] = PackByteBits233(modField, regField, rmField);
+		put(PackByteBits233(modField, regField, rmField));
 
 		// TODO: Sib here
 
@@ -251,7 +256,7 @@ namespace CyberAsm::X86
 			const auto& unpacked = *immediateData;
 			for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(unpacked.Size); ++i)
 			{
-				out[needle++] = static_cast<std::uint8_t>(unpacked.Value >> i * 8 & 0xFF);
+				put(static_cast<std::uint8_t>(unpacked.Value >> i * 8 & 0xFF));
 			}
 		}
 

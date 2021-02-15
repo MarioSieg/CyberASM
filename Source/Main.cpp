@@ -15,7 +15,7 @@ auto main(const int argc, const char* const* const argv) -> int
 	try
 	{
 		auto machineStream = MachineStream<TargetArchitecture::X86_64>(100);
-		const Operand operands[] = {Operand(Register::Rax), Operand(Register::Rsi)};
+		const Operand operands[] = {Operand(Register::Rsi), Operand(Register::Rax)};
 		const auto res = Encode<TargetArchitecture::X86_64>(machineStream.Stream(), Instruction::Adc, operands);
 		std::cout << res << '\n';
 		std::cout << machineStream;

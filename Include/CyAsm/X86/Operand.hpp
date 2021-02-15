@@ -135,5 +135,18 @@ namespace CyberAsm
 		{
 			return OperandFlags::OperandByteSize(this->flags);
 		}
+
+		inline auto operator<<(std::ostream& out, const Operand& operand) -> std::ostream&
+		{
+			if (operand.IsExplicitRegister() || operand.IsImplicitRegister()) [[likely]]
+			{
+				std::cout << "Reg" << static_cast<std::uint16_t>(operand.OperandByteSize()) * CHAR_BIT << '(' << RegisterMnemonicTable[static_cast<std::size_t>(operand.Unwrap().Register)] << ')';
+			}
+			else if (operand.IsImmediate()) [[likely]]
+			{
+				std::cout << "Imm" << static_cast<std::uint16_t>(operand.OperandByteSize()) * CHAR_BIT << '(' << operand.Unwrap().Imm32.Value << ')';
+			}
+			return out;
+		}
 	}
 }
