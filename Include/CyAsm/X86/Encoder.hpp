@@ -244,12 +244,12 @@ namespace CyberAsm::X86
 		{
 			return Result::MemoryToMemoryOperands;
 		}
-		
+
 		if (registerCount >= 1) [[likely]]
 		{
-			const std::uint8_t rmField = registerOperands[0].Address;                                                                            // 3 bits
+			const std::uint8_t rmField = registerOperands[0].Address;                                                  // 3 bits
 			const std::uint8_t regField = opc.Extension.value_or(registerOperands[registerCount > 1 ? 1 : 0].Address); // 3 bits
-			const std::uint8_t modField = mod;                                                                                                   // 2 bits
+			const std::uint8_t modField = mod;                                                                         // 2 bits
 			put(PackByteBits233(modField, regField, rmField));
 		}
 

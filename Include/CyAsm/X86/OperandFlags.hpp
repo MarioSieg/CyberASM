@@ -42,10 +42,13 @@ namespace CyberAsm::X86
 			Reg_16_32_64 = Reg16 | Reg32 | Reg64,
 			Mem_16_32_64 = Mem16 | Mem32 | Mem64,
 			RegMem_16_32_64 = Reg16 | Mem16 | Reg32 | Mem32 | Reg64 | Mem64,
+			Reg_16_32 = Reg16 | Reg32,
+			Mem_16_32 = Mem16 | Mem32,
+			RegMem_16_32 = Reg16 | Mem16 | Reg32 | Mem32,
 			Reg_Rax64_Eax32_Ax16 = Reg64Rax | Reg32Eax | Reg16Ax
 		};
 
-		using Flags = std::underlying_type<Enum>::type;
+		using Flags = std::underlying_type_t<Enum>;
 
 		[[nodiscard]] static constexpr auto IsExplicitRegister(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto IsImplicitRegister(Flags flags) noexcept -> bool;
