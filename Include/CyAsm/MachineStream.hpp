@@ -23,8 +23,8 @@ namespace CyberAsm
 	template <TargetArchitecture Arch = TargetArchitecture::X86_64>
 	class [[nodiscard]] MachineStream final
 	{
-		friend auto operator <<(std::ostream& out, const MachineStream& stream)->std::ostream&;
-		
+		friend auto operator <<(std::ostream& out, const MachineStream& stream) -> std::ostream&;
+
 	public:
 		MachineStream() noexcept;
 		explicit MachineStream(std::vector<std::uint8_t>&& vector) noexcept;
@@ -94,7 +94,7 @@ namespace CyberAsm
 		auto operator ()(const std::filesystem::path& file) -> bool;
 		auto operator==(const MachineStream& rhs) const -> bool;
 		auto operator!=(const MachineStream& rhs) const -> bool;
-		auto operator<=>(const MachineStream& rhs) const->std::strong_ordering;
+		auto operator<=>(const MachineStream& rhs) const -> std::strong_ordering;
 		auto operator==(std::u8string_view rhs) const -> bool;
 		auto operator!=(std::u8string_view rhs) const -> bool;
 
@@ -119,7 +119,7 @@ namespace CyberAsm
 		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) const -> std::vector<std::uint8_t>::const_iterator;
 
 		std::size_t DumpTextLineLimit = 8;
-		
+
 	private:
 		std::vector<std::uint8_t> stream = {};
 	};
@@ -139,7 +139,7 @@ namespace CyberAsm
 	}
 
 	template <TargetArchitecture Arch>
-	inline MachineStream<Arch>::MachineStream() noexcept { }
+	inline MachineStream<Arch>::MachineStream() noexcept = default;
 
 	template <TargetArchitecture Arch>
 	MachineStream<Arch>::MachineStream(std::vector<std::uint8_t>&& vector) noexcept : stream(std::move(vector)) { }

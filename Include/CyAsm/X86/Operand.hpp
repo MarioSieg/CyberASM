@@ -23,8 +23,8 @@ namespace CyberAsm
 
 		class [[nodiscard]] Operand final
 		{
-			friend auto operator<<(std::ostream& out, const Operand& operand)->std::ostream&;
-			
+			friend auto operator<<(std::ostream& out, const Operand& operand) -> std::ostream&;
+
 		public:
 			explicit constexpr Operand(Imm8 value) noexcept;
 			explicit constexpr Operand(Imm16 value) noexcept;
@@ -138,7 +138,7 @@ namespace CyberAsm
 			return OperandFlags::OperandByteSize(this->flags);
 		}
 
-		inline auto operator<<(std::ostream& out, const Operand& operand)->std::ostream&
+		inline auto operator<<(std::ostream& out, const Operand& operand) -> std::ostream&
 		{
 			if (operand.IsExplicitRegister() || operand.IsImplicitRegister()) [[likely]]
 			{
