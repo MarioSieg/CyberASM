@@ -7,6 +7,5 @@ configuration:
 - Debug
 - Release
 
-build:
-  verbosity: normal
-- cmd: cmake --build . --target CyberAsm CyberAsmTests
+build_script:
+- cmake --build . --target CyberAsm CyberAsmTests
