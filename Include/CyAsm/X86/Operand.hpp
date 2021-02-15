@@ -23,6 +23,8 @@ namespace CyberAsm
 
 		class [[nodiscard]] Operand final
 		{
+			friend auto operator<<(std::ostream& out, const Operand& operand)->std::ostream&;
+			
 		public:
 			explicit constexpr Operand(Imm8 value) noexcept;
 			explicit constexpr Operand(Imm16 value) noexcept;
@@ -134,6 +136,19 @@ namespace CyberAsm
 		constexpr auto Operand::OperandByteSize() const noexcept -> FixedSize
 		{
 			return OperandFlags::OperandByteSize(this->flags);
+		}
+
+		inline auto operator<<(std::ostream& out, const Operand& operand)->std::ostream&
+		{
+			if (operand.IsExplicitRegister() || operand.IsImplicitRegister()) [[likely]]
+			{
+				std::cout << "Reg" << static_cast<std::uint16_t>(operand.OperandByteSize()) * CHAR_BIT << '(' << RegisterMnemonicTable[static_cast<std::size_t>(operand.data.Register)] << ')';
+			}
+			else if (operand.IsImmediate()) [[likely]]
+			{
+				std::cout << "Imm" << static_cast<std::uint16_t>(operand.OperandByteSize()) * CHAR_BIT << '(' << operand.data.Imm32.Value << ')';
+			}
+			return out;
 		}
 	}
 }

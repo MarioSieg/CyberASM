@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <execution>
 #include <optional>
+#include <compare>
 #include <string>
 #include <fstream>
 #include <vector>
@@ -22,10 +23,9 @@ namespace CyberAsm
 	template <TargetArchitecture Arch = TargetArchitecture::X86_64>
 	class [[nodiscard]] MachineStream final
 	{
+		friend auto operator <<(std::ostream& out, const MachineStream& stream)->std::ostream&;
+		
 	public:
-		friend auto operator <<(std::ostream& out, const MachineStream& stream) -> std::ostream&;
-		inline static std::size_t DumpTextLineLimit = 8;
-
 		MachineStream() noexcept;
 		explicit MachineStream(std::vector<std::uint8_t>&& vector) noexcept;
 		explicit MachineStream(const std::vector<std::byte>& vector);
@@ -92,12 +92,15 @@ namespace CyberAsm
 		auto operator *() -> std::uint8_t&;
 		auto operator *() const -> std::uint8_t;
 		auto operator ()(const std::filesystem::path& file) -> bool;
+		auto operator==(const MachineStream& rhs) const -> bool;
+		auto operator!=(const MachineStream& rhs) const -> bool;
+		auto operator<=>(const MachineStream& rhs) const->std::strong_ordering;
+		auto operator==(std::u8string_view rhs) const -> bool;
+		auto operator!=(std::u8string_view rhs) const -> bool;
 
 		[[nodiscard]] auto Stream() const & noexcept -> const std::vector<std::uint8_t>&;
 		[[nodiscard]] auto Stream() & noexcept -> std::vector<std::uint8_t>&;
 		[[nodiscard]] auto Stream() && noexcept -> std::vector<std::uint8_t>&&;
-		[[nodiscard]] auto CurrentEndianness() const noexcept -> Endianness;
-		[[nodiscard]] auto SwitchEndianness() -> Endianness;
 		[[nodiscard]] auto TargetArch() const noexcept -> TargetArchitecture;
 
 		void Reserve(std::size_t size);
@@ -115,9 +118,10 @@ namespace CyberAsm
 		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) -> std::vector<std::uint8_t>::iterator;
 		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) const -> std::vector<std::uint8_t>::const_iterator;
 
+		std::size_t DumpTextLineLimit = 8;
+		
 	private:
 		std::vector<std::uint8_t> stream = {};
-		Endianness endianness = Endianness::Little;
 	};
 
 	extern auto operator <<(std::ostream& out, const MachineStream<TargetArchitecture::X86_64>& stream) -> std::ostream&;
@@ -128,16 +132,8 @@ namespace CyberAsm
 	inline auto MachineStream<Arch>::Insert(const T value) -> std::vector<std::uint8_t>&
 	{
 		static_assert(sizeof value);
-
 		std::array<std::uint8_t, sizeof value> raw = {};
-		if (this->endianness == Endianness::Little) [[likely]]
-		{
-			BytePack<decltype(value), Endianness::Little>(raw, value);
-		}
-		else
-		{
-			BytePack<decltype(value), Endianness::Big>(raw, value);
-		}
+		BytePack<decltype(value), Arch == TargetArchitecture::ARM_64 ? Endianness::Big : Endianness::Little>(raw, value);
 		this->stream.insert(this->stream.end(), raw.begin(), raw.end());
 		return this->stream;
 	}
@@ -449,6 +445,36 @@ namespace CyberAsm
 	}
 
 	template <TargetArchitecture Arch>
+	inline auto MachineStream<Arch>::operator==(const MachineStream& rhs) const -> bool
+	{
+		return this->stream == rhs.stream;
+	}
+
+	template <TargetArchitecture Arch>
+	inline auto MachineStream<Arch>::operator!=(const MachineStream& rhs) const -> bool
+	{
+		return this->stream != rhs.stream;
+	}
+
+	template <TargetArchitecture Arch>
+	inline auto MachineStream<Arch>::operator<=>(const MachineStream& rhs) const -> std::strong_ordering
+	{
+		return this->stream <=> rhs.stream;
+	}
+
+	template <TargetArchitecture Arch>
+	inline auto MachineStream<Arch>::operator==(const std::u8string_view rhs) const -> bool
+	{
+		return this->stream.size() != rhs.size() ? false : std::equal(this->stream.begin(), this->stream.end(), rhs.begin());
+	}
+
+	template <TargetArchitecture Arch>
+	inline auto MachineStream<Arch>::operator!=(const std::u8string_view rhs) const -> bool
+	{
+		return this->stream.size() != rhs.size() ? false : std::equal(this->stream.begin(), this->stream.end(), rhs.begin());
+	}
+
+	template <TargetArchitecture Arch>
 	inline auto MachineStream<Arch>::Stream() const & noexcept -> const std::vector<std::uint8_t>&
 	{
 		return this->stream;
@@ -464,19 +490,6 @@ namespace CyberAsm
 	inline auto MachineStream<Arch>::Stream() && noexcept -> std::vector<std::uint8_t>&&
 	{
 		return std::move(this->stream);
-	}
-
-	template <TargetArchitecture Arch>
-	inline auto MachineStream<Arch>::CurrentEndianness() const noexcept -> Endianness
-	{
-		return this->endianness;
-	}
-
-	template <TargetArchitecture Arch>
-	inline auto MachineStream<Arch>::SwitchEndianness() -> Endianness
-	{
-		std::ranges::reverse(this->stream);
-		return this->endianness = this->endianness == Endianness::Little ? Endianness::Big : Endianness::Little;
 	}
 
 	template <TargetArchitecture Arch>
@@ -588,7 +601,7 @@ namespace CyberAsm
 
 	inline auto operator <<(std::ostream& out, const MachineStream<TargetArchitecture::X86_64>& stream) -> std::ostream&
 	{
-		auto printAscii = [&](const std::size_t i, const std::size_t count = MachineStream<TargetArchitecture::X86_64>::DumpTextLineLimit)
+		auto printAscii = [&](const std::size_t i, const std::size_t count)
 		{
 			out << " | ";
 			for (std::size_t j = 0; j < count; ++j)
@@ -599,7 +612,7 @@ namespace CyberAsm
 			out << '\n';
 		};
 
-		const auto hexLimit = MachineStream<TargetArchitecture::X86_64>::DumpTextLineLimit;
+		const auto hexLimit = stream.DumpTextLineLimit;
 
 		for (std::size_t i = 0; i < stream.Size(); ++i)
 		{
@@ -615,7 +628,7 @@ namespace CyberAsm
 			}
 			if ((i + 1) % hexLimit == 0) [[unlikely]]
 			{
-				printAscii(i);
+				printAscii(i, hexLimit);
 			}
 		}
 		out << std::dec << std::endl;
