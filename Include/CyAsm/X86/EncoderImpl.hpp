@@ -41,7 +41,7 @@ namespace CyberAsm::X86
 		const auto instructionIndex = static_cast<std::size_t>(instruction);
 		const char8_t opCode = MachineCodeTable[instructionIndex][variationIndex];
 		const char8_t extension = MachineCodeExtensionTable[instructionIndex][variationIndex];
-		return { opCode, extension == u8'\xFF' ? std::nullopt : std::optional<std::uint8_t>(extension) };
+		return {opCode, extension == u8'\xFF' ? std::nullopt : std::optional<std::uint8_t>(extension)};
 	}
 
 	constexpr auto RetrieveImmediate(const std::span<const Operand> operands) noexcept -> std::optional<ImmediateData>
@@ -99,8 +99,8 @@ namespace CyberAsm::X86
 					continue;
 				}
 
-					// Count of valid operands. If it's the same as the total operand count, all are valid!
-					// It's a match <3
+				// Count of valid operands. If it's the same as the total operand count, all are valid!
+				// It's a match <3
 				std::size_t validCount = 0;
 
 				// Max byte size of operands.
@@ -116,25 +116,25 @@ namespace CyberAsm::X86
 					OperandFlags::Flags additionalFlags = OperandFlags::None;
 					switch (givenFlags)
 					{
-						[[unlikely]]
-					case OperandFlags::Reg8Al:
-						additionalFlags = OperandFlags::Reg8;
-						break;
+							[[unlikely]]
+						case OperandFlags::Reg8Al:
+							additionalFlags = OperandFlags::Reg8;
+							break;
 
-						[[unlikely]]
-					case OperandFlags::Reg16Ax:
-						additionalFlags = OperandFlags::Reg16;
-						break;
+							[[unlikely]]
+						case OperandFlags::Reg16Ax:
+							additionalFlags = OperandFlags::Reg16;
+							break;
 
-						[[likely]]
-					case OperandFlags::Reg32Eax:
-						additionalFlags = OperandFlags::Reg32;
-						break;
+							[[likely]]
+						case OperandFlags::Reg32Eax:
+							additionalFlags = OperandFlags::Reg32;
+							break;
 
-						[[likely]]
-					case OperandFlags::Reg64Rax:
-						additionalFlags = OperandFlags::Reg64;
-						break;
+							[[likely]]
+						case OperandFlags::Reg64Rax:
+							additionalFlags = OperandFlags::Reg64;
+							break;
 					}
 					givenFlags |= additionalFlags;
 
@@ -173,7 +173,7 @@ namespace CyberAsm::X86
 			return result;
 		}
 		const auto twoByte = TwoByteOpCodeTable[instructionIndex];
-		out = { variationIndex, twoByte, maxOpSize };
+		out = {variationIndex, twoByte, maxOpSize};
 		return Result::Ok;
 	}
 
@@ -186,10 +186,10 @@ namespace CyberAsm::X86
 			{
 				++immOps;
 			}
-				if (op.IsMemory()) [[unlikely]]
-				{
-					++memOps;
-				}
+			if (op.IsMemory()) [[unlikely]]
+			{
+				++memOps;
+			}
 		}
 		return immOps == operands.size() ? Result::ImmediateToImmediateOperands : memOps == operands.size() ? Result::MemoryToMemoryOperands : Result::Ok;
 	}

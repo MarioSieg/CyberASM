@@ -133,7 +133,7 @@ namespace CyberAsm
 	}
 
 	template <TargetArchitecture Arch>
-	inline MachineStream<Arch>::MachineStream() noexcept { }
+	inline MachineStream<Arch>::MachineStream() noexcept = default;
 
 	template <TargetArchitecture Arch>
 	MachineStream<Arch>::MachineStream(std::vector<std::uint8_t>&& vector) noexcept : stream(std::move(vector)) { }
