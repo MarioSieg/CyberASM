@@ -9,9 +9,9 @@
 #include "Registers.hpp"
 
 namespace CyberAsm::X86
-{	
+{
 	[[nodiscard]]
-	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate operand) -> std::variant<ByteChunk, Result>
+	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& operand) -> std::variant<ByteChunk, Result>
 	{
 		const auto index = static_cast<std::size_t>(instruction);
 		const auto subIndex = LookupOptimalInstructionVariation<OperandFlags::AnyGpr, OperandFlags::AnyImm>(instruction);

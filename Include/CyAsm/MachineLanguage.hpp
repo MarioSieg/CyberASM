@@ -2,12 +2,13 @@
 
 #include <array>
 #include <algorithm>
+#include <climits>
 
 #include "Utils.hpp"
 
 namespace CyberAsm
 {
-	enum class TargetArchitecture
+	enum class Abi
 	{
 		X86_16,
 		X86_32,
@@ -45,7 +46,8 @@ namespace CyberAsm
 		{
 			value >>= UINT64_C(8);
 			++bytes;
-		} while (value);
+		}
+		while (value);
 		return static_cast<FixedSize>(bytes);
 	}
 

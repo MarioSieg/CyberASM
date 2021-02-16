@@ -4,6 +4,7 @@
 #include <array>
 #include <optional>
 
+#include "../MachineLanguage.hpp"
 #include "OperandFlags.hpp"
 
 namespace CyberAsm::X86
@@ -46,24 +47,29 @@ namespace CyberAsm::X86
 		}
 	};
 
-	template<OperandFlags::Flags... F>
+	template <OperandFlags::Flags... F>
 	constexpr auto LookupOptimalInstructionVariation(const Instruction base) -> std::optional<std::size_t>
 	{
 		const auto index = static_cast<std::size_t>(base);
 		const auto& table = OperandTable[index];
-		const std::array<OperandFlags::Flags, sizeof...(F)> values = { F... };
-		for(const auto& variation : table)
+		constexpr std::array<OperandFlags::Flags, sizeof...(F)> values = {F...};
+		for (std::size_t i = 0; i < table.size(); ++i)
 		{
-			if(variation.size() != sizeof...(F)) [[unlikely]]
+			const auto& variation = *(table.begin() + i);
+			if (variation.size() != sizeof...(F)) [[unlikely]]
 			{
 				continue;
 			}
-			for(std::size_t i = 0; i < sizeof...(F); ++i)
+			std::size_t correctCount = 0;
+			for (std::size_t j = 0; j < sizeof...(F); ++j)
 			{
-				if (values[i] & *(variation.begin() + i)) [[unlikely]]
-				{
-					return i;
-				}
+				const auto given = values[j];
+				const auto required = *(variation.begin() + j);
+				correctCount += (required & given) != 0;
+			}
+			if (correctCount == sizeof...(F)) [[unlikely]]
+			{
+				return i;
 			}
 		}
 		return std::nullopt;

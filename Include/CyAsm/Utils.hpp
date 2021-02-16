@@ -47,7 +47,7 @@ namespace CyberAsm
 		/// </summary>
 		QOWord = 64,
 	};
-	
+
 	template <typename... T>
 	struct Overload : T...
 	{

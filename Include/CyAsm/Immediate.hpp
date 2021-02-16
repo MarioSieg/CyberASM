@@ -4,7 +4,7 @@
 #include <array>
 
 namespace CyberAsm
-{	
+{
 	union Immediate final
 	{
 		std::uint64_t UValue;
@@ -24,20 +24,11 @@ namespace CyberAsm
 	static_assert(sizeof(double) == sizeof(std::uint64_t));
 	static_assert(sizeof(Immediate) == 8);
 
-	constexpr Immediate::Immediate(const std::uint64_t value) noexcept : UValue(value)
-	{
-		
-	}
+	constexpr Immediate::Immediate(const std::uint64_t value) noexcept : UValue(value) { }
 
-	constexpr Immediate::Immediate(const std::array<std::uint8_t, sizeof(std::uint64_t)>& value) noexcept : Bytes(value)
-	{
-		
-	}
+	constexpr Immediate::Immediate(const std::array<std::uint8_t, sizeof(std::uint64_t)>& value) noexcept : Bytes(value) { }
 
-	constexpr Immediate::Immediate(const Immediate& rhs) noexcept : UValue(rhs.UValue)
-	{
-		
-	}
+	constexpr Immediate::Immediate(const Immediate& rhs) noexcept : UValue(rhs.UValue) { }
 
 	constexpr auto Immediate::operator=(const Immediate& rhs) noexcept -> Immediate&
 	{

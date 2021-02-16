@@ -7,7 +7,7 @@
 #include "Instructions.hpp"
 
 namespace CyberAsm::X86
-{	
+{
 	[[nodiscard]]
 	constexpr auto Cas0Encode(const Instruction instruction) -> std::variant<ByteChunk, Result>
 	{

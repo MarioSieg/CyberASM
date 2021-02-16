@@ -40,7 +40,7 @@ namespace CyberAsm
 		[[nodiscard]] constexpr auto ValueBuffer() const noexcept -> const Buffer&;
 		constexpr void Clear() noexcept;
 		constexpr void Fill(std::uint8_t value) noexcept;
-		
+
 		[[nodiscard]] constexpr auto operator[](std::size_t idx) -> std::uint8_t&;
 		[[nodiscard]] constexpr auto operator[](std::size_t idx) const -> std::uint8_t;
 
@@ -164,7 +164,7 @@ namespace CyberAsm
 	inline auto operator <<(std::ostream& out, const ByteChunk& chunk) -> std::ostream&
 	{
 		out << std::setw(2) << std::setfill('0') << std::hex << std::uppercase;
-		for(const auto byte : chunk)
+		for (const auto byte : chunk)
 		{
 			out << byte << ' ';
 		}

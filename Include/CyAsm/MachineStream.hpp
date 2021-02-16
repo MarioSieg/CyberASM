@@ -20,7 +20,7 @@ namespace CyberAsm
 	/// The stream can also be loaded and saved to a binary file.
 	/// Dumping the contents to an fstream, std::stringstream or std::cout is easily possible.
 	/// </summary>
-	template <TargetArchitecture Arch = TargetArchitecture::X86_64>
+	template <Abi Arch = Abi::X86_64>
 	class [[nodiscard]] MachineStream final
 	{
 	public:
@@ -29,7 +29,7 @@ namespace CyberAsm
 		using ConstIterator = StreamBuffer::const_iterator;
 		using ReverseIterator = StreamBuffer::reverse_iterator;
 		using ConstReverseIterator = StreamBuffer::const_reverse_iterator;
-		
+
 		MachineStream() noexcept;
 		explicit MachineStream(StreamBuffer&& vector) noexcept;
 		explicit MachineStream(const std::vector<std::byte>& vector);
@@ -44,8 +44,8 @@ namespace CyberAsm
 
 		template <typename... Ts> requires std::is_trivial_v<Ts...>
 		auto Insert(Ts&&... value) -> StreamBuffer&;
-		auto Insert(ConstIterator begin, ConstIterator end) ->StreamBuffer&;
-		auto Insert(const void* mem, std::size_t size) ->StreamBuffer&;
+		auto Insert(ConstIterator begin, ConstIterator end) -> StreamBuffer&;
+		auto Insert(const void* mem, std::size_t size) -> StreamBuffer&;
 
 		[[nodiscard]] auto begin() const noexcept -> ConstIterator;
 		[[nodiscard]] auto end() const noexcept -> ConstIterator;
@@ -120,28 +120,28 @@ namespace CyberAsm
 		StreamBuffer stream = {};
 	};
 
-	extern auto operator <<(std::ostream& out, const MachineStream<TargetArchitecture::X86_64>& stream) -> std::ostream&;
+	extern auto operator <<(std::ostream& out, const MachineStream<Abi::X86_64>& stream) -> std::ostream&;
 	extern auto operator <<(std::ofstream& out, Endianness endianness) -> std::ostream&;
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	template <typename... Ts> requires std::is_trivial_v<Ts...>
 	inline auto MachineStream<Arch>::Insert(Ts&&... value) -> StreamBuffer&
 	{
-		static_assert(sizeof value);
-		std::array<std::uint8_t, sizeof value> raw = {};
-		BytePack<decltype(value), Endianness::Little>(raw, value);
+		static_assert(sizeof...(value));
+		std::array<std::uint8_t, sizeof...(value)> raw = {};
+		BytePack<std::common_type_t<Ts...>, Endianness::Little>(raw, value...);
 		this->stream.insert(this->stream.end(), raw.begin(), raw.end());
-		(this->Insert<Ts...>(value), ...);
+		(this->template Insert<Ts>(value...), ...);
 		return this->stream;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline MachineStream<Arch>::MachineStream() noexcept = default;
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	MachineStream<Arch>::MachineStream(StreamBuffer&& vector) noexcept : stream(std::move(vector)) { }
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	MachineStream<Arch>::MachineStream(const std::vector<std::byte>& vector)
 	{
 		this->stream.reserve(vector.size());
@@ -151,131 +151,131 @@ namespace CyberAsm
 		}
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline MachineStream<Arch>::MachineStream(const std::uint8_t* const memory, const std::size_t size) : stream(memory, memory + size) {}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline MachineStream<Arch>::MachineStream(const std::byte* const memory, const std::size_t size) : MachineStream(reinterpret_cast<const std::uint8_t*>(memory), size) { }
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline MachineStream<Arch>::MachineStream(const std::size_t capacity)
 	{
 		stream.reserve(capacity);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::byte value) -> MachineStream<Arch>&
 	{
 		this->stream.push_back(static_cast<std::uint8_t>(value));
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::uint8_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::int8_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::uint16_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::int16_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::uint32_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::int32_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::uint64_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::int64_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const float value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const double value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const long double value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const char value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const wchar_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const char16_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const char32_t value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const char* value) -> MachineStream<Arch>&
 	{
 		while (*value) [[likely]]
@@ -285,7 +285,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const wchar_t* value) -> MachineStream<Arch>&
 	{
 		while (*value) [[likely]]
@@ -295,7 +295,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::uint8_t* value) -> MachineStream<Arch>&
 	{
 		while (*value) [[likely]]
@@ -305,7 +305,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const char16_t* value) -> MachineStream<Arch>&
 	{
 		while (*value) [[likely]]
@@ -315,7 +315,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const char32_t* value) -> MachineStream<Arch>&
 	{
 		while (*value) [[likely]]
@@ -325,14 +325,14 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::string& value) -> MachineStream<Arch>&
 	{
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::string_view value) -> MachineStream<Arch>&
 	{
 		this->stream.reserve(this->stream.size() + value.size());
@@ -340,14 +340,14 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::u8string_view value) -> MachineStream<Arch>&
 	{
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::span<std::uint8_t> value) -> MachineStream<Arch>&
 	{
 		this->stream.reserve(this->stream.size() + value.size());
@@ -355,7 +355,7 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(std::span<std::byte> value) -> MachineStream<Arch>&
 	{
 		this->stream.reserve(this->stream.size() + value.size());
@@ -366,14 +366,14 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::vector<std::uint8_t>& value) -> MachineStream<Arch>&
 	{
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const std::vector<std::byte>& value) -> MachineStream<Arch>&
 	{
 		this->stream.reserve(this->stream.size() + value.size());
@@ -384,59 +384,59 @@ namespace CyberAsm
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(std::initializer_list<std::uint8_t>&& value) -> MachineStream<Arch>&
 	{
 		this->stream.insert(this->stream.end(), value.begin(), value.end());
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(std::bitset<8> byteBits) -> MachineStream<Arch>&
 	{
 		this->stream.push_back(static_cast<std::uint8_t>(byteBits.to_ulong()));
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const void* const value) -> MachineStream<Arch>&
 	{
 		this->Insert(value);
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator<<(const ByteChunk& chunk) -> MachineStream&
 	{
 		this->stream.insert(this->stream.end(), chunk.begin(), chunk.end());
 		return *this;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator[](const std::size_t idx) -> std::uint8_t&
 	{
 		return this->stream.at(idx);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator[](const std::size_t idx) const -> std::uint8_t
 	{
 		return this->stream.at(idx);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator*() -> std::uint8_t&
 	{
 		return this->stream.front();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator*() const -> std::uint8_t
 	{
 		return this->stream.front();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator()(const std::filesystem::path& file) -> bool
 	{
 		std::ofstream fstream(file, std::ios::out | std::ios::binary);
@@ -448,80 +448,80 @@ namespace CyberAsm
 		return true;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator==(const MachineStream& rhs) const -> bool
 	{
 		return this->stream == rhs.stream;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator!=(const MachineStream& rhs) const -> bool
 	{
 		return !(*this == rhs);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator==(const std::u8string_view rhs) const -> bool
 	{
 		return this->stream.size() != rhs.size() ? false : std::equal(this->stream.begin(), this->stream.end(), rhs.begin());
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::operator!=(const std::u8string_view rhs) const -> bool
 	{
 		return !(*this == rhs);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Stream() const & noexcept -> const std::vector<std::uint8_t>&
 	{
 		return this->stream;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Stream() & noexcept -> std::vector<std::uint8_t>&
 	{
 		return this->stream;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Stream() && noexcept -> std::vector<std::uint8_t>&&
 	{
 		return std::move(this->stream);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline void MachineStream<Arch>::Reserve(const std::size_t size)
 	{
 		this->stream.reserve(size);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline void MachineStream<Arch>::Clear()
 	{
 		this->stream.clear();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline void MachineStream<Arch>::Resize(const std::size_t size)
 	{
 		this->stream.resize(size);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Size() const noexcept -> std::size_t
 	{
 		return this->stream.size();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline void MachineStream<Arch>::InsertPadding(const std::size_t byteSize, const std::uint8_t scalar, const std::size_t needle)
 	{
 		this->stream.resize(this->stream.size() + byteSize);
 		std::fill_n(this->stream.end() - byteSize, byteSize, scalar);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline void MachineStream<Arch>::InsertPadding(const std::size_t from, const std::size_t to, const std::uint8_t scalar)
 	{
 		for (auto i = from; i < to; ++i)
@@ -530,62 +530,62 @@ namespace CyberAsm
 		}
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Insert(const std::vector<std::uint8_t>::const_iterator begin, const std::vector<std::uint8_t>::const_iterator end) -> StreamBuffer&
 	{
 		this->stream.insert(this->stream.end(), begin, end);
 		return this->stream;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::begin() const noexcept -> ConstIterator
 	{
 		return this->stream.begin();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::end() const noexcept -> ConstIterator
 	{
 		return this->stream.end();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::begin() noexcept -> Iterator
 	{
 		return this->stream.begin();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::end() noexcept -> Iterator
 	{
 		return this->stream.end();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::rbegin() const noexcept -> ConstReverseIterator
 	{
 		return this->stream.rbegin();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::rend() const noexcept -> ConstReverseIterator
 	{
 		return this->stream.rend();
 	}
 
-	template <TargetArchitecture Arch>
-	inline auto MachineStream<Arch>::rbegin() noexcept ->ReverseIterator
+	template <Abi Arch>
+	inline auto MachineStream<Arch>::rbegin() noexcept -> ReverseIterator
 	{
 		return this->stream.rbegin();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::rend() noexcept -> ReverseIterator
 	{
 		return this->stream.rend();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Insert(const void* const mem, const std::size_t size) -> StreamBuffer&
 	{
 		const auto* byte = static_cast<const std::uint8_t*>(mem);
@@ -597,7 +597,7 @@ namespace CyberAsm
 		return this->stream;
 	}
 
-	inline auto operator <<(std::ostream& out, const MachineStream<TargetArchitecture::X86_64>& stream) -> std::ostream&
+	inline auto operator <<(std::ostream& out, const MachineStream<Abi::X86_64>& stream) -> std::ostream&
 	{
 		auto printAscii = [&](const std::size_t i, const std::size_t count)
 		{
@@ -639,37 +639,37 @@ namespace CyberAsm
 		return out;
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Contains(const std::uint8_t target) const -> bool
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target) != this->stream.end();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Find(const std::uint8_t target) -> std::vector<std::uint8_t>::iterator
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Find(const std::uint8_t target) const -> std::vector<std::uint8_t>::const_iterator
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target);
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Contains(const std::span<std::uint8_t> sequence) const -> bool
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end()) != this->stream.end();
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Find(const std::span<std::uint8_t> sequence) -> std::vector<std::uint8_t>::iterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
 	}
 
-	template <TargetArchitecture Arch>
+	template <Abi Arch>
 	inline auto MachineStream<Arch>::Find(const std::span<std::uint8_t> sequence) const -> std::vector<std::uint8_t>::const_iterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
