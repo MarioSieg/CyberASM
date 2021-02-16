@@ -82,7 +82,6 @@ namespace CyberAsm
 			else
 			{
 				const auto size = RegisterSizeTable[static_cast<std::size_t>(value)];
-				assert(size && size <= 64);
 				switch (size)
 				{
 					case 1:
