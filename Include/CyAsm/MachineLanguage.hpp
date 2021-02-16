@@ -3,6 +3,8 @@
 #include <array>
 #include <algorithm>
 
+#include "Utils.hpp"
+
 namespace CyberAsm
 {
 	enum class TargetArchitecture
@@ -34,6 +36,17 @@ namespace CyberAsm
 	[[nodiscard]] constexpr auto EndianSwap(T&& x) -> U
 	{
 		return EndianSwapImpl<U>(x, std::make_index_sequence<sizeof(T)>{});
+	}
+
+	constexpr auto ComputeRequiredByte(std::uint64_t value) noexcept -> FixedSize
+	{
+		std::uint8_t bytes = 0;
+		do
+		{
+			value >>= UINT64_C(8);
+			++bytes;
+		} while (value);
+		return static_cast<FixedSize>(bytes);
 	}
 
 	/// <summary>

@@ -1,22 +1,21 @@
 #pragma once
 
 #include "../ByteChunk.hpp"
+#include "../Immediate.hpp"
 #include "../Result.hpp"
 
 #include "MachineLanguage.hpp"
 #include "Instructions.hpp"
+#include "Registers.hpp"
 
 namespace CyberAsm::X86
 {	
 	[[nodiscard]]
-	constexpr auto Cas0Encode(const Instruction instruction) -> std::variant<ByteChunk, Result>
+	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate operand) -> std::variant<ByteChunk, Result>
 	{
 		const auto index = static_cast<std::size_t>(instruction);
-
-		if (OperandTable[index].size() > 0) [[unlikely]]
-		{
-			return Result::TooManyOperands;
-		}
+		const auto subIndex = LookupOptimalInstructionVariation<OperandFlags::AnyGpr, OperandFlags::AnyImm>(instruction);
+		const auto& operandList = OperandTable[index];
 
 		ByteChunk result = {};
 

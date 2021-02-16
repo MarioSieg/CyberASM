@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <array>
+#include <optional>
 
 #include "OperandFlags.hpp"
 
@@ -21,29 +22,52 @@ namespace CyberAsm::X86
 		std::initializer_list<std::initializer_list<OperandFlags::Flags>>
 		{
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Reg8},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Reg_16_32_64},
+			{OperandFlags::AnyGprOrMem16To64, OperandFlags::AnyGpr16To64},
 			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
-			{OperandFlags::Reg_16_32_64, OperandFlags::RegMem_16_32_64},
+			{OperandFlags::AnyGpr16To64, OperandFlags::AnyGprOrMem16To64},
 			{OperandFlags::Reg8Al, OperandFlags::Imm8},
-			{OperandFlags::Reg_Rax64_Eax32_Ax16, OperandFlags::Imm16 | OperandFlags::Imm32},
+			{OperandFlags::AnyImplicitGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Imm16 | OperandFlags::Imm32},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Imm8},
+			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
+			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm8},
 		},
 		// add
 		std::initializer_list<std::initializer_list<OperandFlags::Flags>>
 		{
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Reg8},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Reg_16_32_64},
+			{OperandFlags::AnyGprOrMem16To64, OperandFlags::AnyGpr16To64},
 			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
-			{OperandFlags::Reg_16_32_64, OperandFlags::RegMem_16_32_64},
+			{OperandFlags::AnyGpr16To64, OperandFlags::AnyGprOrMem16To64},
 			{OperandFlags::Reg8Al, OperandFlags::Imm8},
-			{OperandFlags::Reg_Rax64_Eax32_Ax16, OperandFlags::Imm16 | OperandFlags::Imm32},
+			{OperandFlags::AnyImplicitGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Imm16 | OperandFlags::Imm32},
-			{OperandFlags::RegMem_16_32_64, OperandFlags::Imm8},
+			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
+			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm8},
 		}
 	};
+
+	template<OperandFlags::Flags... F>
+	constexpr auto LookupOptimalInstructionVariation(const Instruction base) -> std::optional<std::size_t>
+	{
+		const auto index = static_cast<std::size_t>(base);
+		const auto& table = OperandTable[index];
+		const std::array<OperandFlags::Flags, sizeof...(F)> values = { F... };
+		for(const auto& variation : table)
+		{
+			if(variation.size() != sizeof...(F)) [[unlikely]]
+			{
+				continue;
+			}
+			for(std::size_t i = 0; i < sizeof...(F); ++i)
+			{
+				if (values[i] & *(variation.begin() + i)) [[unlikely]]
+				{
+					return i;
+				}
+			}
+		}
+		return std::nullopt;
+	}
 
 	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{

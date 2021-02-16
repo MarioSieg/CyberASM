@@ -3,6 +3,8 @@
 #include <cstdint>
 #include <array>
 #include <algorithm>
+#include <iomanip>
+#include <ostream>
 
 namespace CyberAsm
 {
@@ -15,10 +17,10 @@ namespace CyberAsm
 		static constexpr std::size_t MaxByteChunkSize = 16;
 
 		using Buffer = std::array<std::uint8_t, MaxByteChunkSize>;
-		using Iterator = std::array<std::uint8_t, MaxByteChunkSize>::iterator;
-		using ConstIterator = std::array<std::uint8_t, MaxByteChunkSize>::const_iterator;
-		using ReverseIterator = std::array<std::uint8_t, MaxByteChunkSize>::reverse_iterator;
-		using ConstReverseIterator = std::array<std::uint8_t, MaxByteChunkSize>::const_reverse_iterator;
+		using Iterator = Buffer::iterator;
+		using ConstIterator = Buffer::const_iterator;
+		using ReverseIterator = Buffer::reverse_iterator;
+		using ConstReverseIterator = Buffer::const_reverse_iterator;
 
 		constexpr ByteChunk() noexcept = default;
 		explicit constexpr ByteChunk(const Buffer& buffer) noexcept;
@@ -30,9 +32,7 @@ namespace CyberAsm
 		~ByteChunk() = default;
 
 		[[nodiscard]] static constexpr auto Capacity() noexcept -> std::size_t;
-
 		[[nodiscard]] constexpr auto Size() const noexcept -> std::size_t;
-
 		constexpr auto PushBack(std::uint8_t value) -> ByteChunk&;
 		constexpr auto Pop() -> std::uint8_t;
 		[[nodiscard]] constexpr auto Data() noexcept -> std::uint8_t*;
@@ -40,17 +40,18 @@ namespace CyberAsm
 		[[nodiscard]] constexpr auto ValueBuffer() const noexcept -> const Buffer&;
 		constexpr void Clear() noexcept;
 		constexpr void Fill(std::uint8_t value) noexcept;
+		
 		[[nodiscard]] constexpr auto operator[](std::size_t idx) -> std::uint8_t&;
 		[[nodiscard]] constexpr auto operator[](std::size_t idx) const -> std::uint8_t;
 
 		[[nodiscard]] constexpr auto begin() const noexcept -> ConstIterator;
 		[[nodiscard]] constexpr auto end() const noexcept -> ConstIterator;
-		constexpr auto begin() noexcept -> Iterator;
-		constexpr auto end() noexcept -> Iterator;
+		[[nodiscard]] constexpr auto begin() noexcept -> Iterator;
+		[[nodiscard]] constexpr auto end() noexcept -> Iterator;
 		[[nodiscard]] constexpr auto rbegin() const noexcept -> ConstReverseIterator;
 		[[nodiscard]] constexpr auto rend() const noexcept -> ConstReverseIterator;
-		constexpr auto rbegin() noexcept -> ReverseIterator;
-		constexpr auto rend() noexcept -> ReverseIterator;
+		[[nodiscard]] constexpr auto rbegin() noexcept -> ReverseIterator;
+		[[nodiscard]] constexpr auto rend() noexcept -> ReverseIterator;
 
 	private:
 		std::size_t size = 0;
@@ -158,5 +159,15 @@ namespace CyberAsm
 	constexpr auto ByteChunk::rend() noexcept -> ReverseIterator
 	{
 		return this->buffer.rbegin() + size;
+	}
+
+	inline auto operator <<(std::ostream& out, const ByteChunk& chunk) -> std::ostream&
+	{
+		out << std::setw(2) << std::setfill('0') << std::hex << std::uppercase;
+		for(const auto byte : chunk)
+		{
+			out << byte << ' ';
+		}
+		return out;
 	}
 }
