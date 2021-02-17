@@ -6,8 +6,8 @@ pipeline {
           cmakeBuild(
             installation: 'InSearchPath'
           )
-          bat 'setx C "clang"'
-          bat 'setx CXX "clang++"'
+          bat 'set C=clang'
+          bat 'set CXX=clang++'
           bat 'cmake --build . --parallel 8'
       }
     }
