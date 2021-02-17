@@ -1,9 +1,11 @@
 #pragma once
 
+#include <string_view>
 #include <cstdint>
 #include <array>
 #include <optional>
 #include <span>
+#include <stdexcept>
 
 #include "../MachineLanguage.hpp"
 #include "MachineLanguage.hpp"
@@ -92,7 +94,7 @@ namespace CyberAsm::X86
 		return val != TwoByteOpCodePrefix && variation != 0xFF;
 	}
 
-	constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<OperandFlags::Flags> values) -> std::optional<std::size_t>
+	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<OperandFlags::Flags> values) -> std::optional<std::size_t>
 	{
 		const auto index = static_cast<std::size_t>(instr);
 		const auto& table = OperandTable[index];
@@ -131,6 +133,13 @@ namespace CyberAsm::X86
 			}
 		}
 		return std::nullopt;
+	}
+
+	template <OperandFlags::Flags... F>
+	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr) -> std::optional<std::size_t>
+	{
+		std::array<OperandFlags::Flags, sizeof...(F)> values = { F... };
+		return LookupOptimalInstructionVariation(instr, values);
 	}
 
 	consteval auto ValidateTables() noexcept -> bool
