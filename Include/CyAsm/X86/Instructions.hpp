@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <array>
 #include <optional>
+#include <limits>
 
 #include "../MachineLanguage.hpp"
 #include "OperandFlags.hpp"
@@ -27,7 +28,7 @@ namespace CyberAsm::X86
 			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
 			{OperandFlags::AnyGpr16To64, OperandFlags::AnyGprOrMem16To64},
 			{OperandFlags::Reg8Al, OperandFlags::Imm8},
-			{OperandFlags::AnyImplicitGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
+			{OperandFlags::ImplicitAkkuGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},
 			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm8},
@@ -40,7 +41,7 @@ namespace CyberAsm::X86
 			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
 			{OperandFlags::AnyGpr16To64, OperandFlags::AnyGprOrMem16To64},
 			{OperandFlags::Reg8Al, OperandFlags::Imm8},
-			{OperandFlags::AnyImplicitGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
+			{OperandFlags::ImplicitAkkuGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},
 			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
 			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm8},
@@ -60,14 +61,22 @@ namespace CyberAsm::X86
 			{
 				continue;
 			}
-			std::size_t correctCount = 0;
+			std::size_t validated = 0;
 			for (std::size_t j = 0; j < sizeof...(F); ++j)
 			{
-				const auto given = values[j];
-				const auto required = *(variation.begin() + j);
-				correctCount += (required & given) != 0;
+				validated += ((values[j] | [requested = values[j]]() noexcept -> auto
+				{
+					switch (requested)
+					{
+							[[unlikely]] case OperandFlags::Reg8Al: return OperandFlags::Reg8;
+							[[unlikely]] case OperandFlags::Reg16Ax: return OperandFlags::Reg16;
+							[[unlikely]] case OperandFlags::Reg32Eax: return OperandFlags::Reg32;
+							[[unlikely]] case OperandFlags::Reg64Rax: return OperandFlags::Reg64;
+							[[likely]] default: return OperandFlags::None;
+					}
+				}()) & *(variation.begin() + j)) != OperandFlags::None;
 			}
-			if (correctCount == sizeof...(F)) [[unlikely]]
+			if (validated == sizeof...(F)) [[unlikely]]
 			{
 				return i;
 			}

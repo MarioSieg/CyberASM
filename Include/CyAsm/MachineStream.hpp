@@ -25,10 +25,10 @@ namespace CyberAsm
 	{
 	public:
 		using StreamBuffer = std::vector<std::uint8_t>;
-		using Iterator = StreamBuffer::iterator;
-		using ConstIterator = StreamBuffer::const_iterator;
-		using ReverseIterator = StreamBuffer::reverse_iterator;
-		using ConstReverseIterator = StreamBuffer::const_reverse_iterator;
+		using Iterator = std::uint8_t*;
+		using ConstIterator = const Iterator;
+		using ReverseIterator = std::reverse_iterator<Iterator>;
+		using ConstReverseIterator = std::reverse_iterator<ConstIterator>;
 
 		MachineStream() noexcept;
 		explicit MachineStream(StreamBuffer&& vector) noexcept;
@@ -98,9 +98,9 @@ namespace CyberAsm
 		auto operator ==(std::u8string_view rhs) const -> bool;
 		auto operator !=(std::u8string_view rhs) const -> bool;
 
-		[[nodiscard]] auto Stream() const & noexcept -> const std::vector<std::uint8_t>&;
-		[[nodiscard]] auto Stream() & noexcept -> std::vector<std::uint8_t>&;
-		[[nodiscard]] auto Stream() && noexcept -> std::vector<std::uint8_t>&&;
+		[[nodiscard]] auto Stream() const & noexcept -> const StreamBuffer&;
+		[[nodiscard]] auto Stream() & noexcept -> StreamBuffer&;
+		[[nodiscard]] auto Stream() && noexcept -> StreamBuffer&&;
 		void Reserve(std::size_t size);
 		void Clear();
 		void Resize(std::size_t size);
@@ -108,11 +108,11 @@ namespace CyberAsm
 		void InsertPadding(std::size_t byteSize, std::uint8_t scalar = 0, std::size_t needle = 0);
 		void InsertPadding(std::size_t from, std::size_t to, std::uint8_t scalar);
 		[[nodiscard]] auto Contains(std::uint8_t target) const -> bool;
-		[[nodiscard]] auto Find(std::uint8_t target) -> std::vector<std::uint8_t>::iterator;
-		[[nodiscard]] auto Find(std::uint8_t target) const -> std::vector<std::uint8_t>::const_iterator;
+		[[nodiscard]] auto Find(std::uint8_t target) -> Iterator;
+		[[nodiscard]] auto Find(std::uint8_t target) const -> ConstIterator;
 		[[nodiscard]] auto Contains(std::span<std::uint8_t> sequence) const -> bool;
-		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) -> std::vector<std::uint8_t>::iterator;
-		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) const -> std::vector<std::uint8_t>::const_iterator;
+		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) -> Iterator;
+		[[nodiscard]] auto Find(std::span<std::uint8_t> sequence) const -> ConstIterator;
 
 		std::size_t DumpTextLineLimit = 8;
 
@@ -473,19 +473,19 @@ namespace CyberAsm
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Stream() const & noexcept -> const std::vector<std::uint8_t>&
+	inline auto MachineStream<Arch>::Stream() const & noexcept -> const StreamBuffer&
 	{
 		return this->stream;
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Stream() & noexcept -> std::vector<std::uint8_t>&
+	inline auto MachineStream<Arch>::Stream() & noexcept -> StreamBuffer&
 	{
 		return this->stream;
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Stream() && noexcept -> std::vector<std::uint8_t>&&
+	inline auto MachineStream<Arch>::Stream() && noexcept -> StreamBuffer&&
 	{
 		return std::move(this->stream);
 	}
@@ -531,7 +531,7 @@ namespace CyberAsm
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Insert(const std::vector<std::uint8_t>::const_iterator begin, const std::vector<std::uint8_t>::const_iterator end) -> StreamBuffer&
+	inline auto MachineStream<Arch>::Insert(const ConstIterator begin, const ConstIterator end) -> StreamBuffer&
 	{
 		this->stream.insert(this->stream.end(), begin, end);
 		return this->stream;
@@ -615,7 +615,7 @@ namespace CyberAsm
 		for (std::size_t i = 0; i < stream.Size(); ++i)
 		{
 			out << std::setw(2) << std::setfill('0') << std::right << std::hex << std::uppercase;
-			const std::uint8_t value = stream[i];
+			const auto value = stream[i];
 			if (value == 0) [[unlikely]]
 			{
 				out << "00 ";
@@ -646,13 +646,13 @@ namespace CyberAsm
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Find(const std::uint8_t target) -> std::vector<std::uint8_t>::iterator
+	inline auto MachineStream<Arch>::Find(const std::uint8_t target) -> Iterator
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target);
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Find(const std::uint8_t target) const -> std::vector<std::uint8_t>::const_iterator
+	inline auto MachineStream<Arch>::Find(const std::uint8_t target) const -> ConstIterator
 	{
 		return std::find(std::execution::par_unseq, this->stream.begin(), this->stream.end(), target);
 	}
@@ -664,13 +664,13 @@ namespace CyberAsm
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Find(const std::span<std::uint8_t> sequence) -> std::vector<std::uint8_t>::iterator
+	inline auto MachineStream<Arch>::Find(const std::span<std::uint8_t> sequence) -> Iterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
 	}
 
 	template <Abi Arch>
-	inline auto MachineStream<Arch>::Find(const std::span<std::uint8_t> sequence) const -> std::vector<std::uint8_t>::const_iterator
+	inline auto MachineStream<Arch>::Find(const std::span<std::uint8_t> sequence) const -> ConstIterator
 	{
 		return std::search(std::execution::par_unseq, this->stream.begin(), this->stream.end(), sequence.begin(), sequence.end());
 	}

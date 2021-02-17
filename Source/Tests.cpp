@@ -10,9 +10,16 @@ auto main(const int argc, const char* const* const argv) -> int
 {
 	std::cout << "Running CyberAsm tests...\n";
 
-	const auto instruction = LookupOptimalInstructionVariation<OperandFlags::Reg64, OperandFlags::Imm32>(Instruction::Adc);
-	assert(instruction);
-	assert(*instruction == 7);
+	{
+		const auto instruction = LookupOptimalInstructionVariation<OperandFlags::Reg64, OperandFlags::Imm32>(Instruction::Adc);
+		assert(instruction);
+		assert(*instruction == 7);
+	}
+	{
+		const auto instruction = LookupOptimalInstructionVariation<OperandFlags::Reg64Rax, OperandFlags::Imm32>(Instruction::Adc);
+		assert(instruction);
+		assert(*instruction == 5);
+	}
 
 	std::cout << "All tests ok!" << std::endl;
 

@@ -36,11 +36,11 @@ namespace CyberAsm::X86
 			AnyGpr = Reg8 | Reg8Al | Reg16 | Reg16Ax | Reg32 | Reg32Eax | Reg64 | Reg64Rax,
 			AnyMem = Mem8 | Mem16 | Mem32 | Mem64,
 			AnyImm = Imm8 | Imm16 | Imm32 | Imm64,
-			AnyImplicitGpr = Reg8Al | Reg16Ax | Reg32Eax | Reg64Rax,
-			AnyGpr16To64 = Reg16 | Reg32 | Reg64,
+			AnyImplicitAkkuGpr = Reg8Al | Reg16Ax | Reg32Eax | Reg64Rax,
+			AnyGpr16To64 = Reg16 | Reg16Ax | Reg32 | Reg32Eax | Reg64 | Reg64Rax,
 			AnyMem16To64 = Mem16 | Mem32 | Mem64,
-			AnyGprOrMem16To64 = Reg16 | Mem16 | Reg32 | Mem32 | Reg64 | Mem64,
-			AnyImplicitGpr16To64 = Reg64Rax | Reg32Eax | Reg16Ax
+			AnyGprOrMem16To64 = Reg16 | Reg16Ax | Mem16 | Reg32 | Reg32Eax | Mem32 | Reg64 | Reg64Rax | Mem64,
+			ImplicitAkkuGpr16To64 = Reg64Rax | Reg32Eax | Reg16Ax
 		};
 
 		using Flags = std::underlying_type<Enum>::type;
