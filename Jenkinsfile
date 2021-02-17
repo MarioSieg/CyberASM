@@ -6,7 +6,7 @@ pipeline {
           cmakeBuild(
             installation: 'InSearchPath'
           )
-          bat 'cmake --build ${WORKSPACE} --parallel 8'
+          bat 'cmake --build . --parallel 8'
       }
     }
   }
