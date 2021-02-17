@@ -111,10 +111,14 @@ namespace CyberAsm::X86
 				{
 					switch (requested)
 					{
-							[[unlikely]] case OperandFlags::Reg8Al: requested |= OperandFlags::Reg8; break;
-							[[unlikely]] case OperandFlags::Reg16Ax: requested |= OperandFlags::Reg16; break;
-							[[unlikely]] case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32; break;
-							[[unlikely]] case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64; break;
+							[[unlikely]] case OperandFlags::Reg8Al: requested |= OperandFlags::Reg8;
+							break;
+							[[unlikely]] case OperandFlags::Reg16Ax: requested |= OperandFlags::Reg16;
+							break;
+							[[unlikely]] case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32;
+							break;
+							[[unlikely]] case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64;
+							break;
 							[[unlikely]] default: throw std::runtime_error("invalid implicit gpr");
 					}
 				}
