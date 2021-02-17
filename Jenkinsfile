@@ -3,8 +3,7 @@ pipeline {
   stages {
     stage('build') {
       steps {
-          bat 'setx CC "C:/Program Files/LLVM/bin/clang.exe"'
-          bat 'setx CXX "C:/Program Files/LLVM/bin/clang++.exe"'
+          bat 'cmake -G "Visual Studio 16 2019" -D CMAKE_C_COMPILER=clang -D CMAKE_CXX_COMPILER=clang++ C:/Program Files/LLVM/bin/'
           cmakeBuild(
             installation: 'InSearchPath'
           )
