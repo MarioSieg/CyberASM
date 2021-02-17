@@ -6,8 +6,8 @@ pipeline {
           cmakeBuild(
             installation: 'InSearchPath'
           )
-          bat 'cmake -E env LDFLAGS="-fuse-ld=lld-link"'
-          bat 'cmake --build . --parallel 8 -G Ninja -Bbuild ' +
+          bat 'cmake -E env LDFLAGS="-fuse-ld=lld-link"'+
+          'cmake --build . --parallel 8 -G Ninja -Bbuild ' +
           '-DCMAKE_C_COMPILER:PATH="%ProgramFiles%/LLVM/bin/clang.exe" ' +
           '-DCMAKE_CXX_COMPILER:PATH="%ProgramFiles%/LLVM/bin/clang.exe" ' +
           '-DCMAKE_C_COMPILER_ID="Clang" ' +
