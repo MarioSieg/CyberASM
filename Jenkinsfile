@@ -3,8 +3,8 @@ pipeline {
   stages {
     stage('build') {
       steps {
-          bat 'set CC=C:/Program Files/LLVM/bin/clang.exe'
-          bat 'set CXX=C:/Program Files/LLVM/bin/clang++.exe'
+          bat 'setx CC=C:/Program Files/LLVM/bin/clang.exe'
+          bat 'setx CXX=C:/Program Files/LLVM/bin/clang++.exe'
           cmakeBuild(
             installation: 'InSearchPath'
           )
