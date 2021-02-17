@@ -39,7 +39,7 @@ namespace CyberAsm
 		return EndianSwapImpl<U>(x, std::make_index_sequence<sizeof(T)>{});
 	}
 
-	constexpr auto ComputeRequiredByte(std::uint64_t value) noexcept -> FixedSize
+	constexpr auto ComputeRequiredBytes(std::uint64_t value) noexcept -> WordSize
 	{
 		std::uint8_t bytes = 0;
 		do
@@ -48,7 +48,7 @@ namespace CyberAsm
 			++bytes;
 		}
 		while (value);
-		return static_cast<FixedSize>(bytes);
+		return static_cast<WordSize>(bytes);
 	}
 
 	/// <summary>

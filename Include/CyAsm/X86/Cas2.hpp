@@ -3,6 +3,7 @@
 #include "../ByteChunk.hpp"
 #include "../Immediate.hpp"
 
+#include "Mapper.hpp"
 #include "MachineLanguage.hpp"
 #include "Instructions.hpp"
 #include "Registers.hpp"
@@ -12,7 +13,8 @@ namespace CyberAsm::X86
 	[[nodiscard]]
 	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& operand) -> ByteChunk
 	{
-		const auto variation = LookupOptimalInstructionVariation<OperandFlags::Reg8Al, OperandFlags::Imm8>(instruction).value();
+		std::array<OperandFlags::Flags, 2> values = {Mapper::MapFlags(reg), Mapper::MapFlags(operand)};
+		const auto variation = LookupOptimalInstructionVariation(instruction, values).value();
 
 		ByteChunk result = {};
 

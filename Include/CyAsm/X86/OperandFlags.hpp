@@ -49,7 +49,7 @@ namespace CyberAsm::X86
 		[[nodiscard]] static constexpr auto IsImplicitRegister(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto IsImmediate(Flags flags) noexcept -> bool;
 		[[nodiscard]] static constexpr auto IsMemory(Flags flags) noexcept -> bool;
-		[[nodiscard]] static constexpr auto OperandByteSize(Flags flags) noexcept -> FixedSize;
+		[[nodiscard]] static constexpr auto OperandByteSize(Flags flags) noexcept -> WordSize;
 	};
 
 	constexpr auto OperandFlags::IsExplicitRegister(const Flags flags) noexcept -> bool
@@ -72,20 +72,20 @@ namespace CyberAsm::X86
 		return flags >= Mem8 && flags <= Mem64;
 	}
 
-	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> FixedSize
+	constexpr auto OperandFlags::OperandByteSize(const Flags flags) noexcept -> WordSize
 	{
 		if (flags == Reg64Rax || flags & Reg64 || flags & Mem64 || flags & Imm64) [[likely]]
 		{
-			return FixedSize::QWord;
+			return WordSize::QWord;
 		}
 		if (flags == Reg32Eax || flags & Reg32 || flags & Mem32 || flags & Imm32) [[likely]]
 		{
-			return FixedSize::DWord;
+			return WordSize::DWord;
 		}
 		if (flags == Reg16Ax || flags & Reg16 || flags & Mem16 || flags & Imm16) [[unlikely]]
 		{
-			return FixedSize::Word;
+			return WordSize::Word;
 		}
-		return FixedSize::Byte;
+		return WordSize::HWord;
 	}
 }

@@ -105,23 +105,6 @@ namespace CyberAsm::X86
 		Xmm14,
 		Xmm15,
 
-		Ymm0,
-		Ymm1,
-		Ymm2,
-		Ymm3,
-		Ymm4,
-		Ymm5,
-		Ymm6,
-		Ymm7,
-		Ymm8,
-		Ymm9,
-		Ymm10,
-		Ymm11,
-		Ymm12,
-		Ymm13,
-		Ymm14,
-		Ymm15,
-
 		Count
 	};
 
@@ -223,140 +206,114 @@ namespace CyberAsm::X86
 		"xmm13",
 		"xmm14",
 		"xmm15",
+	};
 
-		"ymm0",
-		"ymm1",
-		"ymm2",
-		"ymm3",
-		"ymm4",
-		"ymm5",
-		"ymm6",
-		"ymm7",
-		"ymm8",
-		"ymm9",
-		"ymm10",
-		"ymm11",
-		"ymm12",
-		"ymm13",
-		"ymm14",
-		"ymm15",
+	constexpr std::array<Register, 4> Accumulators
+	{
+		Register::Al,
+		Register::Ax,
+		Register::Eax,
+		Register::Rax
 	};
 
 	/// <summary>
 	/// Contains the size of all registers in bytes.
 	/// </summary>
-	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterSizeTable =
+	constexpr std::array<WordSize, static_cast<std::size_t>(Register::Count)> RegisterSizeTable =
 	{
-		8, // rax
-		4, // eax
-		2, // ax
-		1, // ah
-		1, // al
+		WordSize::QWord, // rax
+		WordSize::DWord, // eax
+		WordSize::Word,  // ax
+		WordSize::HWord, // ah
+		WordSize::HWord, // al
 
-		8, // rbx
-		4, // ebx
-		2, // bx
-		1, // bh
-		1, // bl
+		WordSize::QWord, // rbx
+		WordSize::DWord, // ebx
+		WordSize::Word,  // bx
+		WordSize::HWord, // bh
+		WordSize::HWord, // bl
 
-		8, // rcx
-		4, // ecx
-		2, // cx
-		1, // ch
-		1, // cl
+		WordSize::QWord, // rcx
+		WordSize::DWord, // ecx
+		WordSize::Word,  // cx
+		WordSize::HWord, // ch
+		WordSize::HWord, // cl
 
-		8, // rdx
-		4, // edx
-		2, // dx
-		1, // dh
-		1, // dl
+		WordSize::QWord, // rdx
+		WordSize::DWord, // edx
+		WordSize::Word,  // dx
+		WordSize::HWord, // dh
+		WordSize::HWord, // dl
 
-		8, // rsi
-		4, // esi
-		2, // si
-		1, // sil
+		WordSize::QWord, // rsi
+		WordSize::DWord, // esi
+		WordSize::Word,  // si
+		WordSize::HWord, // sil
 
-		8, // rdi
-		4, // edi
-		2, // di
-		1, // dil
+		WordSize::QWord, // rdi
+		WordSize::DWord, // edi
+		WordSize::Word,  // di
+		WordSize::HWord, // dil
 
-		8, // rbp
-		4, // ebp
-		2, // bp
-		1, // bpl
+		WordSize::QWord, // rbp
+		WordSize::DWord, // ebp
+		WordSize::Word,  // bp
+		WordSize::HWord, // bpl
 
-		8, // rsp
-		4, // esp
-		2, // sp
-		1, // spl
+		WordSize::QWord, // rsp
+		WordSize::DWord, // esp
+		WordSize::Word,  // sp
+		WordSize::HWord, // spl
 
-		8, // rip
-		4, // eip
-		2, // ip
+		WordSize::QWord, // rip
+		WordSize::DWord, // eip
+		WordSize::Word,  // ip
 
-		8, // rflags
-		4, // eflags
-		2, // flags
+		WordSize::QWord, // rflags
+		WordSize::DWord, // eflags
+		WordSize::Word,  // flags
 
-		10, // st0
-		10, // st1
-		10, // st2
-		10, // st3
-		10, // st4
-		10, // st5
-		10, // st6
-		10, // st7
+		WordSize::WordQWord, // st0
+		WordSize::WordQWord, // st1
+		WordSize::WordQWord, // st2
+		WordSize::WordQWord, // st3
+		WordSize::WordQWord, // st4
+		WordSize::WordQWord, // st5
+		WordSize::WordQWord, // st6
+		WordSize::WordQWord, // st7
 
-		8, // mm0
-		8, // mm1
-		8, // mm2
-		8, // mm3
-		8, // mm4
-		8, // mm5
-		8, // mm6
-		8, // mm7
+		WordSize::QWord, // mm0
+		WordSize::QWord, // mm1
+		WordSize::QWord, // mm2
+		WordSize::QWord, // mm3
+		WordSize::QWord, // mm4
+		WordSize::QWord, // mm5
+		WordSize::QWord, // mm6
+		WordSize::QWord, // mm7
 
-		2, // es
-		2, // cs
-		2, // ss
-		2, // ds
-		2, // fs
-		2, //gs
+		WordSize::Word, // es
+		WordSize::Word, // cs
+		WordSize::Word, // ss
+		WordSize::Word, // ds
+		WordSize::Word, // fs
+		WordSize::Word, //gs
 
-		16, // xmm0
-		16, // xmm1
-		16, // xmm2
-		16, // xmm3
-		16, // xmm4
-		16, // xmm5
-		16, // xmm6
-		16, // xmm7
-		16, // xmm8
-		16, // xmm9
-		16, // xmm10
-		16, // xmm11
-		16, // xmm12
-		16, // xmm13
-		16, // xmm14
-		16, // xmm15
-
-		32, // ymm0
-		32, // ymm1
-		32, // ymm2
-		32, // ymm3
-		32, // ymm4
-		32, // ymm5
-		32, // ymm6
-		32, // ymm7
-		32, // ymm8
-		32, // ymm9
-		32, // ymm10
-		32, // ymm11
-		32, // ymm12
-		32, // ymm13
-		32, // ymm14
-		32  // ymm15
+		WordSize::OWord, // xmm0
+		WordSize::OWord, // xmm1
+		WordSize::OWord, // xmm2
+		WordSize::OWord, // xmm3
+		WordSize::OWord, // xmm4
+		WordSize::OWord, // xmm5
+		WordSize::OWord, // xmm6
+		WordSize::OWord, // xmm7
+		WordSize::OWord, // xmm8
+		WordSize::OWord, // xmm9
+		WordSize::OWord, // xmm10
+		WordSize::OWord, // xmm11
+		WordSize::OWord, // xmm12
+		WordSize::OWord, // xmm13
+		WordSize::OWord, // xmm14
+		WordSize::OWord, // xmm15
 	};
 
 	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterIdTable =

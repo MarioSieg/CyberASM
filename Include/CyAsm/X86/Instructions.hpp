@@ -106,17 +106,20 @@ namespace CyberAsm::X86
 			std::size_t validated = 0;
 			for (std::size_t j = 0; j < values.size(); ++j)
 			{
-				validated += ((values[j] | [requested = values[j]]() noexcept -> auto
+				auto requested = values[j];
+				if (OperandFlags::IsImplicitRegister(requested)) [[unlikely]]
 				{
 					switch (requested)
 					{
-							[[unlikely]] case OperandFlags::Reg8Al: return OperandFlags::Reg8;
-							[[unlikely]] case OperandFlags::Reg16Ax: return OperandFlags::Reg16;
-							[[unlikely]] case OperandFlags::Reg32Eax: return OperandFlags::Reg32;
-							[[unlikely]] case OperandFlags::Reg64Rax: return OperandFlags::Reg64;
-							[[likely]] default: return OperandFlags::None;
+							[[unlikely]] case OperandFlags::Reg8Al: requested |= OperandFlags::Reg8;
+							[[unlikely]] case OperandFlags::Reg16Ax: requested |= OperandFlags::Reg16;
+							[[unlikely]] case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32;
+							[[unlikely]] case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64;
+							[[unlikely]] default: throw std::runtime_error("invalid implicit gpr");
 					}
-				}()) & *(variation.begin() + j)) != OperandFlags::None;
+				}
+				const auto required = *(variation.begin() + j);
+				validated += (requested & required) != OperandFlags::None;
 			}
 			if (validated == values.size()) [[unlikely]]
 			{
@@ -124,13 +127,6 @@ namespace CyberAsm::X86
 			}
 		}
 		return std::nullopt;
-	}
-
-	template <OperandFlags::Flags... F>
-	constexpr auto LookupOptimalInstructionVariation(const Instruction instr) -> std::optional<std::size_t>
-	{
-		std::array<OperandFlags::Flags, sizeof...(F)> values = {F...};
-		return LookupOptimalInstructionVariation(instr, values);
 	}
 
 	consteval auto ValidateTables() noexcept -> bool

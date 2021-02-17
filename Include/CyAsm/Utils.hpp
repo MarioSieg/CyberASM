@@ -4,12 +4,13 @@
 
 namespace CyberAsm
 {
-	enum class FixedSize : std::uint8_t
+	enum class WordSize : std::uint8_t
 	{
 		/// <summary>
 		/// 1 byte, 8 bit
+		/// half word
 		/// </summary>
-		Byte = 1,
+		HWord = 1,
 
 		/// <summary>
 		/// 2 byte, 16 bit
@@ -27,6 +28,12 @@ namespace CyberAsm
 		/// 8 byte, 64 bit
 		/// </summary>
 		QWord = 8,
+
+		/// <summary>
+		/// 10 bytes, 80 bits
+		/// word + qword
+		/// </summary>
+		WordQWord = 10,
 
 		/// <summary>
 		/// octa word
