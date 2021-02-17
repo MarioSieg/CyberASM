@@ -2,30 +2,26 @@
 
 #include "../ByteChunk.hpp"
 #include "../Immediate.hpp"
-#include "../Result.hpp"
 
 #include "MachineLanguage.hpp"
 #include "Instructions.hpp"
 #include "Registers.hpp"
 
-
 namespace CyberAsm::X86
 {
 	[[nodiscard]]
-	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& operand) -> std::variant<ByteChunk, Result>
+	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& operand) -> ByteChunk
 	{
-		const auto index = static_cast<std::size_t>(instruction);
-		const auto subIndex = LookupOptimalInstructionVariation<OperandFlags::AnyGpr, OperandFlags::AnyImm>(instruction);
-		const auto& operandList = OperandTable[index];
+		const auto variation = LookupOptimalInstructionVariation<OperandFlags::Reg8Al, OperandFlags::Imm8>(instruction).value();
 
 		ByteChunk result = {};
 
-		if (TwoByteOpCodeTable[index]) [[likely]]
+		if (RequiresTwoByteOpCode(instruction, variation)) [[likely]]
 		{
-			result.PushBack(TwoByteOpCodePrefix);
+			result << TwoByteOpCodePrefix;
 		}
 
-		result.PushBack(MachineCodeTable[index][0]);
+		result << FetchMachineByte(instruction, variation);
 
 		return result;
 	}

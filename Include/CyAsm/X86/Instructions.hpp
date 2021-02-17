@@ -3,9 +3,10 @@
 #include <cstdint>
 #include <array>
 #include <optional>
-#include <limits>
+#include <span>
 
 #include "../MachineLanguage.hpp"
+#include "MachineLanguage.hpp"
 #include "OperandFlags.hpp"
 
 namespace CyberAsm::X86
@@ -48,21 +49,62 @@ namespace CyberAsm::X86
 		}
 	};
 
-	template <OperandFlags::Flags... F>
-	constexpr auto LookupOptimalInstructionVariation(const Instruction base) -> std::optional<std::size_t>
+	/// <summary>
+	/// Contains the machine code for each entry above.
+	/// </summary>
+	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{
-		const auto index = static_cast<std::size_t>(base);
+		u8"\x10\x11\x12\x13\x14\x15\x80\x81\x83"_mach, // adc
+		u8"\x00\x01\x02\x03\x04\x05\x80\x81\x83"_mach, // add
+	};
+
+	/// <summary>
+	/// Contains op code extensions and two byte escapes.
+	/// FF = no extension
+	/// 0F = requires to byte op code escape
+	/// * = the extension between 0-7 (3 bits for mod/rm byte)
+	/// </summary>
+	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
+	{
+		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x02\x02\x02"_mach, // adc
+		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00"_mach, // add
+	};
+
+	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
+	{
+		"adc",
+		"add"
+	};
+
+	constexpr auto FetchMachineByte(const Instruction instr, const std::size_t variation) -> std::uint8_t
+	{
+		return MachineCodeTable[static_cast<std::size_t>(instr)][variation];
+	}
+
+	constexpr auto RequiresTwoByteOpCode(const Instruction instr, const std::size_t variation) -> bool
+	{
+		return MachineCodeExtensionTable[static_cast<std::size_t>(instr)][variation] == TwoByteOpCodePrefix;
+	}
+
+	constexpr auto RequiresOpCodeExtension(const Instruction instr, const std::size_t variation) -> bool
+	{
+		const auto val = MachineCodeExtensionTable[static_cast<std::size_t>(instr)][variation];
+		return val != TwoByteOpCodePrefix && variation != 0xFF;
+	}
+
+	constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<OperandFlags::Flags> values) -> std::optional<std::size_t>
+	{
+		const auto index = static_cast<std::size_t>(instr);
 		const auto& table = OperandTable[index];
-		constexpr std::array<OperandFlags::Flags, sizeof...(F)> values = {F...};
 		for (std::size_t i = 0; i < table.size(); ++i)
 		{
 			const auto& variation = *(table.begin() + i);
-			if (variation.size() != sizeof...(F)) [[unlikely]]
+			if (variation.size() != values.size()) [[unlikely]]
 			{
 				continue;
 			}
 			std::size_t validated = 0;
-			for (std::size_t j = 0; j < sizeof...(F); ++j)
+			for (std::size_t j = 0; j < values.size(); ++j)
 			{
 				validated += ((values[j] | [requested = values[j]]() noexcept -> auto
 				{
@@ -76,7 +118,7 @@ namespace CyberAsm::X86
 					}
 				}()) & *(variation.begin() + j)) != OperandFlags::None;
 			}
-			if (validated == sizeof...(F)) [[unlikely]]
+			if (validated == values.size()) [[unlikely]]
 			{
 				return i;
 			}
@@ -84,30 +126,12 @@ namespace CyberAsm::X86
 		return std::nullopt;
 	}
 
-	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
+	template <OperandFlags::Flags... F>
+	constexpr auto LookupOptimalInstructionVariation(const Instruction instr) -> std::optional<std::size_t>
 	{
-		u8"\x10\x11\x12\x13\x14\x15\x80\x81\x83"_mach, // adc
-		u8"\x00\x01\x02\x03\x04\x05\x80\x81\x83"_mach, // add
-	};
-
-	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
-	{
-		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x02\x02\x02"_mach, // adc
-		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00"_mach, // add
-	};
-
-	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
-	{
-		"adc",
-		"add"
-	};
-
-	constexpr std::array<bool, static_cast<std::size_t>(Instruction::Count)> TwoByteOpCodeTable
-	{
-		false, false
-	};
-
-	constexpr std::size_t MaxInstructionBytes = 16;
+		std::array<OperandFlags::Flags, sizeof...(F)> values = {F...};
+		return LookupOptimalInstructionVariation(instr, values);
+	}
 
 	consteval auto ValidateTables() noexcept -> bool
 	{

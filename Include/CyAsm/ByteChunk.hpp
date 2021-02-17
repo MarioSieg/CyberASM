@@ -41,8 +41,11 @@ namespace CyberAsm
 		constexpr void Clear() noexcept;
 		constexpr void Fill(std::uint8_t value) noexcept;
 
-		[[nodiscard]] constexpr auto operator[](std::size_t idx) -> std::uint8_t&;
-		[[nodiscard]] constexpr auto operator[](std::size_t idx) const -> std::uint8_t;
+		constexpr auto operator <<(std::uint8_t value) noexcept -> ByteChunk&;
+		constexpr auto operator <<(std::byte value) noexcept -> ByteChunk&;
+		constexpr auto operator <<(char8_t value) noexcept -> ByteChunk&;
+		[[nodiscard]] constexpr auto operator [](std::size_t idx) -> std::uint8_t&;
+		[[nodiscard]] constexpr auto operator [](std::size_t idx) const -> std::uint8_t;
 
 		[[nodiscard]] constexpr auto begin() const noexcept -> ConstIterator;
 		[[nodiscard]] constexpr auto end() const noexcept -> ConstIterator;
@@ -111,6 +114,21 @@ namespace CyberAsm
 		this->buffer.fill(value);
 	}
 
+	constexpr auto ByteChunk::operator<<(const std::uint8_t value) noexcept -> ByteChunk&
+	{
+		return this->PushBack(value);
+	}
+
+	constexpr auto ByteChunk::operator<<(const std::byte value) noexcept -> ByteChunk&
+	{
+		return this->PushBack(static_cast<std::uint8_t>(value));
+	}
+
+	constexpr auto ByteChunk::operator<<(const char8_t value) noexcept -> ByteChunk&
+	{
+		return this->PushBack(value);
+	}
+
 	constexpr auto ByteChunk::operator[](const std::size_t idx) -> std::uint8_t&
 	{
 		return this->buffer.at(idx);
@@ -166,7 +184,7 @@ namespace CyberAsm
 		out << std::setw(2) << std::setfill('0') << std::hex << std::uppercase;
 		for (const auto byte : chunk)
 		{
-			out << byte << ' ';
+			out << static_cast<std::uint16_t>(byte) << ' ';
 		}
 		return out;
 	}

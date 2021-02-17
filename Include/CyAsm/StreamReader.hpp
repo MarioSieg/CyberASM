@@ -1,27 +1,44 @@
 #pragma once
 
 #include <fstream>
-#include <type_traits>
 #include <filesystem>
 #include <string>
+#include <algorithm>
+#include <execution>
+
+#include "Result.hpp"
 
 namespace CyberAsm
 {
-	template <typename F> requires std::is_invocable_v<F, std::string&&, const std::size_t>
-	[[nodiscard]] inline auto ReadTextChunkStreamed(const std::filesystem::path& path, F proc) -> bool
+	inline auto ReadFile(std::string& out, const std::filesystem::path& path) -> Result
 	{
-		std::ifstream stream(path);
-		if (!stream) [[unlikely]]
+		try
 		{
-			return false;
+			std::ifstream stream(path);
+			if (!stream) [[unlikely]]
+			{
+				return Result::FileNotFound;
+			}
+			stream.seekg(0, std::ios::end);
+			out.reserve(stream.tellg());
+			stream.seekg(0, std::ios::beg);
+			out.assign(std::istreambuf_iterator<char>(stream), std::istreambuf_iterator<char>(stream));
+			return Result::Ok;
 		}
-
-		std::string tmp = {};
-		for (std::size_t i = 1; std::getline(stream, tmp); ++i)
+		catch (...)
 		{
-			proc(std::move(tmp), i);
+			return Result::FileNotFound;
 		}
+	}
 
-		return true;
+	inline void SplitLines(const std::string& target, std::vector<std::size_t>& needles)
+	{
+		for (auto i = target.begin(); (i = std::find_if(i, target.end(), [](const char x)
+		{
+			return x == '\n';
+		})) != target.end(); ++i)
+		{
+			needles.push_back(*i);
+		}
 	}
 }

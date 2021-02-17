@@ -20,6 +20,16 @@ auto main(const int argc, const char* const* const argv) -> int
 		assert(instruction);
 		assert(*instruction == 5);
 	}
+	{
+		const auto instruction = LookupOptimalInstructionVariation<OperandFlags::Reg8, OperandFlags::Reg8>(Instruction::Adc);
+		assert(instruction);
+		assert(*instruction == 0);
+	}
+	{
+		const auto instruction = LookupOptimalInstructionVariation<OperandFlags::Reg16Ax, OperandFlags::Imm8>(Instruction::Adc);
+		assert(instruction);
+		assert(*instruction == 8);
+	}
 
 	std::cout << "All tests ok!" << std::endl;
 
