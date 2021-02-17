@@ -6,7 +6,7 @@ pipeline {
           cmakeBuild(
             installation: 'InSearchPath'
           )
-          bat 'cmake -T"LLVM-vs2014" --build . --parallel 8'
+          bat 'cmake -T"LLVM-vs2014" --build .'
       }
     }
   }
