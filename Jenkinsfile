@@ -7,6 +7,8 @@ pipeline {
             installation: 'InSearchPath'
           )
           sh 'cmake --build . --parallel 8'
+          sh './CyberAsm'
+          sh './CyberAsmTests'
       }
     }
   }
