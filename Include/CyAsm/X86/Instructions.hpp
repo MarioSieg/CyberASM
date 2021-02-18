@@ -138,7 +138,7 @@ namespace CyberAsm::X86
 	template <OperandFlags::Flags... F>
 	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr) -> std::optional<std::size_t>
 	{
-		std::array<OperandFlags::Flags, sizeof...(F)> values = { F... };
+		std::array<OperandFlags::Flags, sizeof...(F)> values = {F...};
 		return LookupOptimalInstructionVariation(instr, values);
 	}
 

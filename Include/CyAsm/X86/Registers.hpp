@@ -296,7 +296,7 @@ namespace CyberAsm::X86
 		WordSize::Word, // ss
 		WordSize::Word, // ds
 		WordSize::Word, // fs
-		WordSize::Word, //gs
+		WordSize::Word, // gs
 
 		WordSize::OWord, // xmm0
 		WordSize::OWord, // xmm1

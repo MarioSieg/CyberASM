@@ -30,7 +30,7 @@ namespace CyberAsm
 	template <typename T, std::size_t... N>
 	[[nodiscard]] constexpr auto EndianSwapImpl(T&& x, std::index_sequence<N...>) -> T
 	{
-		return (((x >> N * CHAR_BIT & 0xFFU) << (sizeof(T) - N - 1U) * CHAR_BIT) | ...);
+		return (((x >> N * CHAR_BIT & 0xFF) << (sizeof(T) - N - 1U) * CHAR_BIT) | ...);
 	}
 
 	template <typename T, typename U = std::make_unsigned_t<T>>
