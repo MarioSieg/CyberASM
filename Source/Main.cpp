@@ -6,6 +6,8 @@ using namespace CyberAsm;
 
 auto main(const int argc, const char* const* const argv) -> int
 {
+	(void)argc, (void)argv;
+	
 	std::cout << "Cyber Assembly\n----------------\n";
 
 	using namespace X86;

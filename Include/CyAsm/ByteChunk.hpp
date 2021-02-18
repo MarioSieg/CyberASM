@@ -37,7 +37,7 @@ namespace CyberAsm
 		constexpr auto Pop() -> std::uint8_t;
 		[[nodiscard]] constexpr auto Data() noexcept -> std::uint8_t*;
 		[[nodiscard]] constexpr auto Data() const noexcept -> const std::uint8_t*;
-		[[nodiscard]] constexpr auto ValueBuffer() const noexcept -> const Buffer&;
+		[[nodiscard]] constexpr auto ChunkBuffer() const noexcept -> const Buffer&;
 		constexpr void Clear() noexcept;
 		constexpr void Fill(std::uint8_t value) noexcept;
 
@@ -58,14 +58,14 @@ namespace CyberAsm
 
 	private:
 		std::size_t size = 0;
-		Buffer buffer = {};
+		Buffer chunkBuffer = {};
 	};
 
-	constexpr ByteChunk::ByteChunk(const Buffer& buffer) noexcept : buffer(buffer) { }
+	constexpr ByteChunk::ByteChunk(const Buffer& buffer) noexcept : chunkBuffer(buffer) { }
 
 	inline ByteChunk::ByteChunk(const std::uint8_t (&buffer)[MaxByteChunkSize]) noexcept
 	{
-		std::ranges::copy(buffer, this->buffer.begin());
+		std::ranges::copy(buffer, this->chunkBuffer.begin());
 	}
 
 	constexpr auto ByteChunk::Capacity() noexcept -> std::size_t
@@ -80,38 +80,38 @@ namespace CyberAsm
 
 	constexpr auto ByteChunk::PushBack(const std::uint8_t value) -> ByteChunk&
 	{
-		this->buffer.at(this->size++) = value;
+		this->chunkBuffer.at(this->size++) = value;
 		return *this;
 	}
 
 	constexpr auto ByteChunk::Pop() -> std::uint8_t
 	{
-		return this->buffer.at(this->size--);
+		return this->chunkBuffer.at(this->size--);
 	}
 
 	constexpr auto ByteChunk::Data() noexcept -> std::uint8_t*
 	{
-		return this->buffer.data();
+		return this->chunkBuffer.data();
 	}
 
 	constexpr auto ByteChunk::Data() const noexcept -> const std::uint8_t*
 	{
-		return this->buffer.data();
+		return this->chunkBuffer.data();
 	}
 
-	constexpr auto ByteChunk::ValueBuffer() const noexcept -> const Buffer&
+	constexpr auto ByteChunk::ChunkBuffer() const noexcept -> const Buffer&
 	{
-		return this->buffer;
+		return this->chunkBuffer;
 	}
 
 	constexpr void ByteChunk::Clear() noexcept
 	{
-		this->buffer.fill(0);
+		this->chunkBuffer.fill(0);
 	}
 
 	constexpr void ByteChunk::Fill(const std::uint8_t value) noexcept
 	{
-		this->buffer.fill(value);
+		this->chunkBuffer.fill(value);
 	}
 
 	constexpr auto ByteChunk::operator<<(const std::uint8_t value) noexcept -> ByteChunk&
@@ -131,52 +131,52 @@ namespace CyberAsm
 
 	constexpr auto ByteChunk::operator[](const std::size_t idx) -> std::uint8_t&
 	{
-		return this->buffer.at(idx);
+		return this->chunkBuffer.at(idx);
 	}
 
 	constexpr auto ByteChunk::operator[](const std::size_t idx) const -> std::uint8_t
 	{
-		return this->buffer.at(idx);
+		return this->chunkBuffer.at(idx);
 	}
 
 	constexpr auto ByteChunk::begin() const noexcept -> ConstIterator
 	{
-		return this->buffer.begin();
+		return this->chunkBuffer.begin();
 	}
 
 	constexpr auto ByteChunk::end() const noexcept -> ConstIterator
 	{
-		return this->buffer.begin() + size;
+		return this->chunkBuffer.begin() + static_cast<ptrdiff_t>(size);
 	}
 
 	constexpr auto ByteChunk::begin() noexcept -> Iterator
 	{
-		return this->buffer.begin();
+		return this->chunkBuffer.begin();
 	}
 
 	constexpr auto ByteChunk::end() noexcept -> Iterator
 	{
-		return this->buffer.begin() + size;
+		return this->chunkBuffer.begin() + static_cast<ptrdiff_t>(size);
 	}
 
 	constexpr auto ByteChunk::rbegin() const noexcept -> ConstReverseIterator
 	{
-		return this->buffer.rbegin();
+		return this->chunkBuffer.rbegin();
 	}
 
 	constexpr auto ByteChunk::rend() const noexcept -> ConstReverseIterator
 	{
-		return this->buffer.rbegin() + size;
+		return this->chunkBuffer.rbegin() + static_cast<ptrdiff_t>(size);
 	}
 
 	constexpr auto ByteChunk::rbegin() noexcept -> ReverseIterator
 	{
-		return this->buffer.rbegin();
+		return this->chunkBuffer.rbegin();
 	}
 
 	constexpr auto ByteChunk::rend() noexcept -> ReverseIterator
 	{
-		return this->buffer.rbegin() + size;
+		return this->chunkBuffer.rbegin() + static_cast<std::ptrdiff_t>(size);
 	}
 
 	inline auto operator <<(std::ostream& out, const ByteChunk& chunk) -> std::ostream&

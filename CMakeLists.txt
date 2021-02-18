@@ -2,12 +2,8 @@ cmake_minimum_required (VERSION 3.8)
 
 project("Cyber Assembler" CXX)
 
-if(MSVC)
-
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -permissive")
-SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS}")
-
-endif()
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -flto -Ofast -march=native -Wall -Wextra -Werror -Wno-c++20-compat -Wno-c++98-compat -Wno-switch-enum  -Wno-c++98-compat-pedantic -Wno-unknown-attributes")
+set(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS}")
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

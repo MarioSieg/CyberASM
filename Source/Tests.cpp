@@ -8,6 +8,8 @@ using namespace X86;
 
 auto main(const int argc, const char* const* const argv) -> int
 {
+	(void)argc;
+	(void)argv;
 	std::cout << "Running CyberAsm tests...\n";
 
 	{
