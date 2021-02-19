@@ -94,9 +94,10 @@ namespace CyberAsm::X86
 		const auto val = MachineCodeExtensionTable[static_cast<std::size_t>(instr)][variation];
 		return val != TwoByteOpCodePrefix && variation != 0xFF;
 	}
-
+	
 	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<const OperandFlags::Flags> values) -> std::optional<std::size_t>
 	{
+		// @formatter:off
 		const auto index = static_cast<std::size_t>(instr);
 		const auto& table = OperandTable[index];
 		for (std::size_t i = 0; i < table.size(); ++i)
@@ -114,14 +115,10 @@ namespace CyberAsm::X86
 				{
 					switch (requested)
 					{
-							[[unlikely]] case OperandFlags::Reg8Al: requested |= OperandFlags::Reg8;
-							break;
-							[[unlikely]] case OperandFlags::Reg16Ax: requested |= OperandFlags::Reg16;
-							break;
-							[[unlikely]] case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32;
-							break;
-							[[unlikely]] case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64;
-							break;
+							[[unlikely]] case OperandFlags::Reg8Al: requested |= OperandFlags::Reg8; break;
+							[[unlikely]] case OperandFlags::Reg16Ax: requested |= OperandFlags::Reg16; break;
+							[[unlikely]] case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32; break;
+							[[unlikely]] case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64; break;
 							[[unlikely]] default: throw std::runtime_error("invalid implicit gpr");
 					}
 				}
@@ -134,6 +131,7 @@ namespace CyberAsm::X86
 			}
 		}
 		return std::nullopt;
+		// @formatter:on
 	}
 
 	template <OperandFlags::Flags... F>
