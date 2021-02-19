@@ -24,32 +24,7 @@ namespace CyberAsm::X86
 
 	constexpr std::array<std::initializer_list<std::initializer_list<OperandFlags::Flags>>, static_cast<std::size_t>(Instruction::Count)> OperandTable
 	{
-		// adc
-		std::initializer_list<std::initializer_list<OperandFlags::Flags>>
-		{
-			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Reg8},
-			{OperandFlags::AnyGprOrMem16To64, OperandFlags::AnyGpr16To64},
-			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
-			{OperandFlags::AnyGpr16To64, OperandFlags::AnyGprOrMem16To64},
-			{OperandFlags::Reg8Al, OperandFlags::Imm8},
-			{OperandFlags::ImplicitAkkuGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
-			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},
-			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
-			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm8},
-		},
-		// add
-		std::initializer_list<std::initializer_list<OperandFlags::Flags>>
-		{
-			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Reg8},
-			{OperandFlags::AnyGprOrMem16To64, OperandFlags::AnyGpr16To64},
-			{OperandFlags::Reg8, OperandFlags::Reg8 | OperandFlags::Mem8},
-			{OperandFlags::AnyGpr16To64, OperandFlags::AnyGprOrMem16To64},
-			{OperandFlags::Reg8Al, OperandFlags::Imm8},
-			{OperandFlags::ImplicitAkkuGpr16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
-			{OperandFlags::Reg8 | OperandFlags::Mem8, OperandFlags::Imm8},
-			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm16 | OperandFlags::Imm32},
-			{OperandFlags::AnyGprOrMem16To64, OperandFlags::Imm8},
-		}
+#include "OperandTable.inl"
 	};
 
 	/// <summary>
@@ -57,8 +32,7 @@ namespace CyberAsm::X86
 	/// </summary>
 	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{
-		u8"\x10\x11\x12\x13\x14\x15\x80\x81\x83"_mach, // adc
-		u8"\x00\x01\x02\x03\x04\x05\x80\x81\x83"_mach, // add
+#include "MachineCodeTable.inl"
 	};
 
 	/// <summary>
@@ -69,14 +43,12 @@ namespace CyberAsm::X86
 	/// </summary>
 	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
 	{
-		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x02\x02\x02"_mach, // adc
-		u8"\xFF\xFF\xFF\xFF\xFF\xFF\x00\x00\x00"_mach, // add
+#include "MachineCodeExtensionTable.inl"
 	};
 
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
 	{
-		"adc",
-		"add"
+#include "MnemonicTable.inl"
 	};
 
 	constexpr auto FetchMachineByte(const Instruction instr, const std::size_t variation) -> std::uint8_t
@@ -94,8 +66,13 @@ namespace CyberAsm::X86
 		const auto val = MachineCodeExtensionTable[static_cast<std::size_t>(instr)][variation];
 		return val != TwoByteOpCodePrefix && variation != 0xFF;
 	}
-	
-	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<const OperandFlags::Flags> values) -> std::optional<std::size_t>
+
+	constexpr auto LookupOpCodeExtension(const Instruction instr, const std::size_t variation) -> std::optional<std::uint8_t>
+	{
+		return RequiresOpCodeExtension(instr, variation) ? MachineCodeExtensionTable[static_cast<std::size_t>(instr)][variation] : 0;
+	}
+
+	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<const OperandFlags::Flags> operands) -> std::optional<std::size_t>
 	{
 		// @formatter:off
 		const auto index = static_cast<std::size_t>(instr);
@@ -103,29 +80,29 @@ namespace CyberAsm::X86
 		for (std::size_t i = 0; i < table.size(); ++i)
 		{
 			const auto& variation = *(table.begin() + i);
-			if (variation.size() != values.size()) [[unlikely]]
+			if (variation.size() != operands.size()) [[unlikely]]
 			{
 				continue;
 			}
 			std::size_t validated = 0;
-			for (std::size_t j = 0; j < values.size(); ++j)
+			for (std::size_t j = 0; j < operands.size(); ++j)
 			{
-				auto requested = values[j];
+				auto requested = operands[j];
 				if (OperandFlags::IsImplicitRegister(requested)) [[unlikely]]
 				{
 					switch (requested)
 					{
-							[[unlikely]] case OperandFlags::Reg8Al: requested |= OperandFlags::Reg8; break;
-							[[unlikely]] case OperandFlags::Reg16Ax: requested |= OperandFlags::Reg16; break;
-							[[unlikely]] case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32; break;
-							[[unlikely]] case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64; break;
-							[[unlikely]] default: throw std::runtime_error("invalid implicit gpr");
+						[[unlikely]] case OperandFlags::Reg8Al:   requested |= OperandFlags::Reg8;  break;
+						[[unlikely]] case OperandFlags::Reg16Ax:  requested |= OperandFlags::Reg16; break;
+						[[likely]]	 case OperandFlags::Reg32Eax: requested |= OperandFlags::Reg32; break;
+						[[likely]]	 case OperandFlags::Reg64Rax: requested |= OperandFlags::Reg64; break;
+						[[unlikely]] default: throw std::runtime_error("Invalid implicit GPR! Must be 'al', 'ax', 'eax' or 'rax'!");
 					}
 				}
 				const auto required = *(variation.begin() + j);
 				validated += (requested & required) != OperandFlags::None;
 			}
-			if (validated == values.size()) [[unlikely]]
+			if (validated == operands.size()) [[unlikely]]
 			{
 				return i;
 			}
@@ -142,10 +119,55 @@ namespace CyberAsm::X86
 	}
 
 	template <typename... Ts>
-	[[nodiscard]] constexpr auto AutoMapAndLookup(const Instruction instr, Ts&&... args) -> std::optional<std::size_t>
+	[[nodiscard]] constexpr auto AutoLookupInstruction(const Instruction instr, Ts&&... args) -> std::optional<std::size_t>
 	{
 		const std::initializer_list<const OperandFlags::Flags> collection{Mapper::MapFlags(args)...};
 		return LookupOptimalInstructionVariation(instr, collection);
+	}
+
+	/// <summary>
+	/// A REX prefix must be encoded when:
+	///		- using 64 - bit operand size and the instruction does not default to 64 - bit operand size; or
+	///		- using one of the extended registers(R8 to R15, XMM8 to XMM15, YMM8 to YMM15, CR8 to CR15and DR8 to DR15); or
+	///		- using one of the uniform byte registers SPL, BPL, SIL or DIL.
+	///		
+	/// A REX prefix must not be encoded when :
+	///		- using one of the high byte registers AH, CH, BH or DH.
+	///
+	///	In all other cases, the REX prefix is ignored. The use of multiple REX prefixes is undefined, although processors seem to use only the last REX prefix.	
+	///	Instructions that default to 64 - bit operand size in long mode are :
+	///		CALL(near)	ENTER	Jcc
+	///		JrCXZ	JMP(near)	LEAVE
+	///		LGDT	LIDT	LLDT
+	///		LOOP	LOOPcc	LTR
+	///		MOV CR(n)	MOV DR(n)	POP reg / mem
+	///		POP reg	POP FS	POP GS
+	///		POPFQ	PUSH imm8	PUSH imm32
+	///		PUSH reg / mem	PUSH reg	PUSH FS
+	///		PUSH GS	PUSHFQ	RET(near)
+	/// </summary>
+	/// <param name="instr">The target instruction.</param>
+	/// <param name="variation">The instruction variation.</param>
+	/// <returns>True if required, else false.</returns>
+	template <Abi Arch>
+	[[nodiscard]] constexpr auto RequiresRexPrefix(const Instruction instr, const std::size_t variation) -> bool
+	{
+		// Is long mode?
+		if constexpr (Arch != Abi::X86_64)
+		{
+			return false;
+		}
+
+		const auto& operands = *(OperandTable[static_cast<std::size_t>(instr)].begin() + variation);
+		for (const auto flags : operands)
+		{
+			if (Is64BitOrLarger(OperandFlags::OperandByteSize(flags))) [[likely]]
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	consteval auto ValidateTables() noexcept -> bool

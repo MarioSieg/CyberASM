@@ -55,6 +55,11 @@ namespace CyberAsm
 		QOWord = 64,
 	};
 
+	constexpr auto Is64BitOrLarger(const WordSize size) noexcept -> bool
+	{
+		return static_cast<std::uint8_t>(size) >= static_cast<std::uint8_t>(WordSize::QWord);
+	}
+
 	template <typename... T>
 	struct Overload : T...
 	{

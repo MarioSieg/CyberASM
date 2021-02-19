@@ -49,6 +49,7 @@ namespace CyberAsm::X86
 	// +---+---+---+---+---+---+---+---+
 	// | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
 	// +---+---+---+---+---+---+---+---+
+	//	 7						     0
 	constexpr auto PackByteBits233(std::uint8_t bs01, std::uint8_t b234, std::uint8_t b567) noexcept -> std::uint8_t
 	{
 		b567 &= ~0b1111'1000U;

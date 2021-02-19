@@ -6,6 +6,9 @@
 #include <iomanip>
 #include <ostream>
 
+#include "Immediate.hpp"
+#include "MachineLanguage.hpp"
+
 namespace CyberAsm
 {
 	/// <summary>
@@ -44,6 +47,7 @@ namespace CyberAsm
 		constexpr auto operator <<(std::uint8_t value) noexcept -> ByteChunk&;
 		constexpr auto operator <<(std::byte value) noexcept -> ByteChunk&;
 		constexpr auto operator <<(char8_t value) noexcept -> ByteChunk&;
+		constexpr auto operator <<(const Immediate& imm) noexcept -> ByteChunk&;
 		[[nodiscard]] constexpr auto operator [](std::size_t idx) -> std::uint8_t&;
 		[[nodiscard]] constexpr auto operator [](std::size_t idx) const -> std::uint8_t;
 
@@ -129,6 +133,15 @@ namespace CyberAsm
 		return this->PushBack(value);
 	}
 
+	constexpr auto ByteChunk::operator<<(const Immediate& imm) noexcept -> ByteChunk&
+	{
+		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(ComputeRequiredBytes(imm.UValue)); ++i)
+		{
+			*this << imm.Bytes[i];
+		}
+		return *this;
+	}
+
 	constexpr auto ByteChunk::operator[](const std::size_t idx) -> std::uint8_t&
 	{
 		return this->chunkBuffer.at(idx);
@@ -181,10 +194,9 @@ namespace CyberAsm
 
 	inline auto operator <<(std::ostream& out, const ByteChunk& chunk) -> std::ostream&
 	{
-		out << std::setw(2) << std::setfill('0') << std::hex << std::uppercase;
 		for (const auto byte : chunk)
 		{
-			out << static_cast<std::uint16_t>(byte) << ' ';
+			out << std::setw(2) << std::setfill('0') << std::hex << std::uppercase << static_cast<std::uint16_t>(byte) << ' ';
 		}
 		return out;
 	}
