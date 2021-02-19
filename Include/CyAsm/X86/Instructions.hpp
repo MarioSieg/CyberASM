@@ -10,6 +10,7 @@
 #include "../MachineLanguage.hpp"
 #include "MachineLanguage.hpp"
 #include "OperandFlags.hpp"
+#include "Mapper.hpp"
 
 namespace CyberAsm::X86
 {
@@ -94,7 +95,7 @@ namespace CyberAsm::X86
 		return val != TwoByteOpCodePrefix && variation != 0xFF;
 	}
 
-	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<OperandFlags::Flags> values) -> std::optional<std::size_t>
+	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr, const std::span<const OperandFlags::Flags> values) -> std::optional<std::size_t>
 	{
 		const auto index = static_cast<std::size_t>(instr);
 		const auto& table = OperandTable[index];
@@ -138,8 +139,15 @@ namespace CyberAsm::X86
 	template <OperandFlags::Flags... F>
 	[[nodiscard]] constexpr auto LookupOptimalInstructionVariation(const Instruction instr) -> std::optional<std::size_t>
 	{
-		std::array<OperandFlags::Flags, sizeof...(F)> values = {F...};
-		return LookupOptimalInstructionVariation(instr, values);
+		const std::array<const OperandFlags::Flags, sizeof...(F)> collection = {F...};
+		return LookupOptimalInstructionVariation(instr, collection);
+	}
+
+	template <typename... Ts>
+	[[nodiscard]] constexpr auto AutoMapAndLookup(const Instruction instr, Ts&&... args) -> std::optional<std::size_t>
+	{
+		const std::initializer_list<const OperandFlags::Flags> collection{Mapper::MapFlags(args)...};
+		return LookupOptimalInstructionVariation(instr, collection);
 	}
 
 	consteval auto ValidateTables() noexcept -> bool

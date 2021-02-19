@@ -62,7 +62,6 @@ namespace CyberAsm
 		Big
 	};
 
-
 	/// <summary>
 	/// Converts a trivial object into a byte array.
 	/// </summary>
@@ -78,13 +77,7 @@ namespace CyberAsm
 			T Instance;
 			std::array<std::uint8_t, sizeof(T)> Bytes;
 		} castor = {in};
-
-		if constexpr (sizeof(T) == 1)
-		{
-			out[0] = castor.Bytes[0];
-			return;
-		}
-		else if constexpr (E == Endianness::Little)
+		if constexpr (E == Endianness::Little)
 		{
 			std::copy(castor.Bytes.begin(), castor.Bytes.end(), out.begin());
 		}
