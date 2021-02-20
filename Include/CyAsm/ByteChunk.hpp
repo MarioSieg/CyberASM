@@ -50,6 +50,8 @@ namespace CyberAsm
 		constexpr auto operator <<(const Immediate& imm) noexcept -> ByteChunk&;
 		[[nodiscard]] constexpr auto operator [](std::size_t idx) -> std::uint8_t&;
 		[[nodiscard]] constexpr auto operator [](std::size_t idx) const -> std::uint8_t;
+		constexpr auto operator ==(const ByteChunk& rhs) const noexcept -> bool = default;
+		constexpr auto operator !=(const ByteChunk& rhs) const noexcept -> bool = default;
 
 		[[nodiscard]] constexpr auto begin() const noexcept -> ConstIterator;
 		[[nodiscard]] constexpr auto end() const noexcept -> ConstIterator;

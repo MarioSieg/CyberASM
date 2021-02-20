@@ -113,20 +113,27 @@ namespace CyberAsm::X86
 	/// </summary>
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Register::Count)> RegisterMnemonicTable
 	{
-#include "RegisterMnemonicTable.inl"
+		#include "RegisterMnemonicTable.inl"
 	};
 
-	constexpr std::array<Register, 4> Accumulators
-	{
-		Register::Al,
-		Register::Ax,
-		Register::Eax,
-		Register::Rax
-	};
-
+	/// <summary>
+	/// Checks if the register is an implicit accumulator GPR.
+	/// </summary>
+	/// <param name="reg">The target register.</param>
+	/// <returns>True if the register is an implicit accumulator GPR.</returns>
 	constexpr auto IsAccumulator(const Register reg) noexcept -> bool
 	{
-		return std::find(Accumulators.begin(), Accumulators.end(), reg) != Accumulators.end();
+		return reg == Register::Al || reg == Register::Ax || reg == Register::Eax || reg == Register::Rax;
+	}
+
+	/// <summary>
+	/// Checks if the register is a high-byte register such as ah, bh, ch or dh.
+	/// </summary>
+	/// <param name="reg">The target register.</param>
+	/// <returns>True if the register is a high-byte such as ah, bh, ch and dh.</returns>
+	constexpr auto IsHighByteRegister(const Register reg) noexcept -> bool
+	{
+		return reg == Register::Ah || reg == Register::Bh || reg == Register::Ch || reg == Register::Dh;
 	}
 
 	/// <summary>
@@ -134,12 +141,12 @@ namespace CyberAsm::X86
 	/// </summary>
 	constexpr std::array<WordSize, static_cast<std::size_t>(Register::Count)> RegisterSizeTable =
 	{
-#include "RegisterSizeTable.inl"
+		#include "RegisterSizeTable.inl"
 	};
 
 	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterIdTable =
 	{
-#include "RegisterIdTable.inl"
+		#include "RegisterIdTable.inl"
 	};
 
 	[[nodiscard]] constexpr auto LookupRegisterId(const Register reg) -> std::uint8_t

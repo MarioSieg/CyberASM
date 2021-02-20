@@ -25,18 +25,15 @@ namespace CyberAsm::X86::Mapper
 	{
 		// @formatter:off
 		// Check if register is accumulator:
-		for (const auto accum : Accumulators)
+		if(IsAccumulator(register_)) [[unlikely]]
 		{
-			if (accum == register_) [[unlikely]]
+			switch (RegisterSizeTable[static_cast<std::size_t>(register_)])
 			{
-				switch (RegisterSizeTable[static_cast<std::size_t>(register_)])
-				{
-					[[unlikely]] case WordSize::HWord: return OperandFlags::Reg8Al;
-					[[unlikely]] case WordSize::Word:  return OperandFlags::Reg16Ax;
-					[[likely]]   case WordSize::DWord: return OperandFlags::Reg32Eax;
-					[[likely]]   case WordSize::QWord: return OperandFlags::Reg64Rax;
-					[[unlikely]] default: throw std::runtime_error("not implemented");
-				}
+				[[unlikely]] case WordSize::HWord: return OperandFlags::Reg8Al;
+				[[unlikely]] case WordSize::Word:  return OperandFlags::Reg16Ax;
+				[[likely]]	 case WordSize::DWord: return OperandFlags::Reg32Eax;
+				[[likely]]   case WordSize::QWord: return OperandFlags::Reg64Rax;
+				[[unlikely]] default: throw std::runtime_error("not implemented");
 			}
 		}
 

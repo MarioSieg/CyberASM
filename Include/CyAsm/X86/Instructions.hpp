@@ -24,7 +24,7 @@ namespace CyberAsm::X86
 
 	constexpr std::array<std::initializer_list<std::initializer_list<OperandFlags::Flags>>, static_cast<std::size_t>(Instruction::Count)> OperandTable
 	{
-#include "OperandTable.inl"
+		#include "OperandTable.inl"
 	};
 
 	/// <summary>
@@ -32,7 +32,7 @@ namespace CyberAsm::X86
 	/// </summary>
 	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeTable
 	{
-#include "MachineCodeTable.inl"
+		#include "MachineCodeTable.inl"
 	};
 
 	/// <summary>
@@ -43,12 +43,12 @@ namespace CyberAsm::X86
 	/// </summary>
 	constexpr std::array<std::u8string_view, static_cast<std::size_t>(Instruction::Count)> MachineCodeExtensionTable
 	{
-#include "MachineCodeExtensionTable.inl"
+		#include "MachineCodeExtensionTable.inl"
 	};
 
 	constexpr std::array<std::string_view, static_cast<std::size_t>(Instruction::Count)> MnemonicTable
 	{
-#include "MnemonicTable.inl"
+		#include "MnemonicTable.inl"
 	};
 
 	constexpr auto FetchMachineByte(const Instruction instr, const std::size_t variation) -> std::uint8_t

@@ -6,7 +6,8 @@ using namespace CyberAsm;
 
 auto main(const int argc, const char* const* const argv) -> int
 {
-	(void)argc, (void)argv;
+	static_cast<void>(argc);
+	static_cast<void>(argv);
 
 	std::cout << "Cyber Assembly\n----------------\n";
 

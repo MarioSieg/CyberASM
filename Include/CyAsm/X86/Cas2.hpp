@@ -19,6 +19,13 @@ namespace CyberAsm::X86
 		// REX
 		if (RequiresRexPrefix<Arch>(instruction, variation)) [[likely]]
 		{
+			// The high 8-bit registers (AH, CH, DH, BH ) are not addressable when a REX prefix is used.
+			if (IsHighByteRegister(reg)) [[unlikely]]
+			{
+				throw std::runtime_error("The high byte registers 'ah', 'bh', 'ch' and 'dh' are not addressable when a REX prefix is used!");
+			}
+
+			// Write REX prefix:
 			result << RexW64;
 		}
 
