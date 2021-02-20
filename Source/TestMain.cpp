@@ -100,6 +100,50 @@ static void RunAllTestsForX86()
 		assert(machineCode[2] == 0xFF);
 		static_cast<void>(machineCode);
 	}
+
+	// adc spl, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Spl, Immediate(5));
+		assert(machineCode.Size() == 4);
+		assert(machineCode[0] == 0x40);
+		assert(machineCode[1] == 0x80);
+		assert(machineCode[2] == 0xD4);
+		assert(machineCode[3] == 0x05);
+		static_cast<void>(machineCode);
+	}
+
+	// adc bpl, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Bpl, Immediate(5));
+		assert(machineCode.Size() == 4);
+		assert(machineCode[0] == 0x40);
+		assert(machineCode[1] == 0x80);
+		assert(machineCode[2] == 0xD5);
+		assert(machineCode[3] == 0x05);
+		static_cast<void>(machineCode);
+	}
+
+	// adc sil, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Sil, Immediate(5));
+		assert(machineCode.Size() == 4);
+		assert(machineCode[0] == 0x40);
+		assert(machineCode[1] == 0x80);
+		assert(machineCode[2] == 0xD6);
+		assert(machineCode[3] == 0x05);
+		static_cast<void>(machineCode);
+	}
+
+	// adc dil, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Dil, Immediate(5));
+		assert(machineCode.Size() == 4);
+		assert(machineCode[0] == 0x40);
+		assert(machineCode[1] == 0x80);
+		assert(machineCode[2] == 0xD7);
+		assert(machineCode[3] == 0x05);
+		static_cast<void>(machineCode);
+	}
 }
 
 auto main(const int argc, const char* const* const argv) -> int

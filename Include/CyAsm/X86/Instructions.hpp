@@ -125,51 +125,6 @@ namespace CyberAsm::X86
 		return LookupOptimalInstructionVariation(instr, collection);
 	}
 
-	/// <summary>
-	/// A REX prefix must be encoded when:
-	///		- using 64 - bit operand size and the instruction does not default to 64 - bit operand size; or
-	///		- using one of the extended registers(R8 to R15, XMM8 to XMM15, YMM8 to YMM15, CR8 to CR15and DR8 to DR15); or
-	///		- using one of the uniform byte registers SPL, BPL, SIL or DIL.
-	///		
-	/// A REX prefix must not be encoded when :
-	///		- using one of the high byte registers AH, CH, BH or DH.
-	///
-	///	In all other cases, the REX prefix is ignored. The use of multiple REX prefixes is undefined, although processors seem to use only the last REX prefix.	
-	///	Instructions that default to 64 - bit operand size in long mode are :
-	///		CALL(near)	ENTER	Jcc
-	///		JrCXZ	JMP(near)	LEAVE
-	///		LGDT	LIDT	LLDT
-	///		LOOP	LOOPcc	LTR
-	///		MOV CR(n)	MOV DR(n)	POP reg / mem
-	///		POP reg	POP FS	POP GS
-	///		POPFQ	PUSH imm8	PUSH imm32
-	///		PUSH reg / mem	PUSH reg	PUSH FS
-	///		PUSH GS	PUSHFQ	RET(near)
-	/// </summary>
-	/// <param name="instr">The target instruction.</param>
-	/// <param name="variation">The instruction variation.</param>
-	/// <returns>True if required, else false.</returns>
-	template <Abi Arch>
-	[[nodiscard]] constexpr auto RequiresRexPrefix(const Instruction instr, const std::size_t variation) -> bool
-	{
-		// Is long mode?
-		if constexpr (Arch != Abi::X86_64)
-		{
-			return false;
-		}
-
-		const auto& operands = *(OperandTable[static_cast<std::size_t>(instr)].begin() + variation);
-		for (const auto flags : operands)
-		{
-			if (Is64BitOrLarger(OperandFlags::OperandByteSize(flags))) [[likely]]
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
 	consteval auto ValidateTables() noexcept -> bool
 	{
 		for (std::size_t i = 0; i < static_cast<std::size_t>(Instruction::Count); ++i)

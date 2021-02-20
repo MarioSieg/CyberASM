@@ -117,6 +117,24 @@ namespace CyberAsm::X86
 	};
 
 	/// <summary>
+	/// Contains the size of all registers in bytes.
+	/// </summary>
+	constexpr std::array<WordSize, static_cast<std::size_t>(Register::Count)> RegisterSizeTable =
+	{
+		#include "RegisterSizeTable.inl"
+	};
+
+	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterIdTable =
+	{
+		#include "RegisterIdTable.inl"
+	};
+
+	[[nodiscard]] constexpr auto LookupRegisterId(const Register reg) -> std::uint8_t
+	{
+		return RegisterIdTable[static_cast<std::size_t>(reg)];
+	}
+
+	/// <summary>
 	/// Checks if the register is an implicit accumulator GPR.
 	/// </summary>
 	/// <param name="reg">The target register.</param>
@@ -137,20 +155,35 @@ namespace CyberAsm::X86
 	}
 
 	/// <summary>
-	/// Contains the size of all registers in bytes.
+	/// Checks if the register is a uniform byte register such as spl, bpl, sil or dil.
 	/// </summary>
-	constexpr std::array<WordSize, static_cast<std::size_t>(Register::Count)> RegisterSizeTable =
+	/// <param name="reg">The target register.</param>
+	/// <returns>True if the register is a uniform high register such as spl, bpl, sil or dil, else false.</returns>
+	constexpr auto IsUniformByteRegister(const Register reg) noexcept -> bool
 	{
-		#include "RegisterSizeTable.inl"
-	};
+		return reg == Register::Spl || reg == Register::Bpl || reg == Register::Sil || reg == Register::Dil;
+	}
 
-	constexpr std::array<std::uint8_t, static_cast<std::size_t>(Register::Count)> RegisterIdTable =
+	/// <summary>
+	/// Checks if the register is 64 bit or larger.
+	/// </summary>
+	/// <param name="reg"></param>
+	/// <returns></returns>
+	constexpr auto IsMin64BitRegister(const Register reg) noexcept -> bool
 	{
-		#include "RegisterIdTable.inl"
-	};
+		return Is64BitOrLarger(RegisterSizeTable[static_cast<std::size_t>(reg)]);
+	}
 
-	[[nodiscard]] constexpr auto LookupRegisterId(const Register reg) -> std::uint8_t
+	/// <summary>
+	/// Checks if the register is a 64-bit extended register such as:
+	/// R8 to R15, XMM8 to XMM15, YMM8 to YMM15, CR8 to CR15 and DR8 to DR15
+	/// </summary>
+	/// <param name="reg"></param>
+	/// <returns></returns>
+	constexpr auto IsExtendedRegister(const Register reg) noexcept -> bool
 	{
-		return RegisterIdTable[static_cast<std::size_t>(reg)];
+		(void)reg;
+		// TODO
+		return false;
 	}
 }

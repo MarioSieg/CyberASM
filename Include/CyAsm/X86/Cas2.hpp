@@ -16,8 +16,22 @@ namespace CyberAsm::X86
 
 		ByteChunk result = {};
 
+		const auto isAnyOperand64Bit = IsMin64BitRegister(reg) || Is64BitOrLarger(ComputeRequiredBytes(operand.UValue));
+		
+		// Using 64-bit operand size and the instruction does not default to 64-bit operand size?
+		auto requiresRex = isAnyOperand64Bit;
+
+		// Using one of the extended registers (R8 to R15, XMM8 to XMM15, YMM8 to YMM15, CR8 to CR15 and DR8 to DR15)?
+		requiresRex |= IsExtendedRegister(reg);
+
+		// Using one of the uniform byte registers SPL, BPL, SIL or DIL ?
+		requiresRex |= IsUniformByteRegister(reg);
+
+		// A REX prefix must not be encoded when using one of the high byte registers AH, CH, BH or DH:
+		requiresRex &= !IsHighByteRegister(reg);
+
 		// REX
-		if (RequiresRexPrefix<Arch>(instruction, variation)) [[likely]]
+		if (requiresRex) [[likely]]
 		{
 			// The high 8-bit registers (AH, CH, DH, BH ) are not addressable when a REX prefix is used.
 			if (IsHighByteRegister(reg)) [[unlikely]]
@@ -26,7 +40,7 @@ namespace CyberAsm::X86
 			}
 
 			// Write REX prefix:
-			result << RexW64;
+			result << PackByteRexPrefix(isAnyOperand64Bit, false, false, false);
 		}
 
 		// Opcode
@@ -44,7 +58,7 @@ namespace CyberAsm::X86
 			const auto modField = ModBitsRegisterAddressing;
 			const auto regField = LookupOpCodeExtension(instruction, variation).value_or(0);
 			const auto rmField = LookupRegisterId(reg);
-			result << PackByteBits233(modField, regField, rmField);
+			result << PackByteBitsModRmSib(modField, regField, rmField);
 		}
 
 		// SIB:

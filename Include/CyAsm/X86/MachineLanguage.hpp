@@ -32,9 +32,25 @@ namespace CyberAsm::X86
 
 	// @formatter:on
 
-	// +---+---+---+---+---+---+---+---+
-	// | 0   1   0   0 | w | r | x | b |
-	// +---+---+---+---+---+---+---+---+
+	/// <summary>
+	/// +---+---+---+---+---+---+---+---+
+	/// | 0 | 1 | 0 | 0 | W | R | X | B |
+	/// +---+---+---+---+---+---+---+---+
+	/// +-------+--------+-------------+
+	/// | Field | Length | Description |
+	/// +-------+--------+-------------+
+	/// |  0100	| 4 bits | Fixed magic bit pattern
+	///	|   W	| 1 bit	 | When 1, a 64 - bit operand size is used.Otherwise, when 0, the default operand size is used (which is 32 - bit for most but not all instructions).
+	/// |   R	| 1 bit	 | This 1 - bit value is an extension to the MODRM.reg field. See Registers.
+	/// |   X	| 1 bit	 | This 1 - bit value is an extension to the SIB.index field. See 64 - bit addressing.
+	/// |   B	| 1 bit	 | This 1 - bit value is an extension to the MODRM.rm field or the SIB.base field.See 64 - bit addressing.
+	/// +-------+--------+-------------+
+	/// </summary>
+	/// <param name="w"></param>
+	/// <param name="r"></param>
+	/// <param name="x"></param>
+	/// <param name="b"></param>
+	/// <returns></returns>
 	constexpr auto PackByteRexPrefix(const bool w, const bool r = false, const bool x = false, const bool b = false) noexcept -> std::uint8_t
 	{
 		std::uint8_t rex = 0b0000'0100U;
@@ -47,15 +63,14 @@ namespace CyberAsm::X86
 	}
 
 	// +---+---+---+---+---+---+---+---+
-	// | 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 |
+	// | 7 | 6 | 5 | 4 | 3 | 2 | 1 | 0 |
 	// +---+---+---+---+---+---+---+---+
-	//	 7						     0
-	constexpr auto PackByteBits233(std::uint8_t bs01, std::uint8_t b234, std::uint8_t b567) noexcept -> std::uint8_t
+	constexpr auto PackByteBitsModRmSib(std::uint8_t bs01, std::uint8_t b234, std::uint8_t b567) noexcept -> std::uint8_t
 	{
 		b567 &= ~0b1111'1000U;
 		b234 &= ~0b1111'1000U;
-		b234 <<= 3U;
 		bs01 &= ~0b1111'1100U;
+		b234 <<= 3U;
 		bs01 <<= 6U;
 		b567 |= b234;
 		b567 |= bs01;

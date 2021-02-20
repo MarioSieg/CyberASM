@@ -15,7 +15,7 @@ auto main(const int argc, const char* const* const argv) -> int
 
 	try
 	{
-		const ByteChunk chunk = Cas2Encode<>(Instruction::Adc, Register::Cl, Immediate(32));
+		const ByteChunk chunk = Cas2Encode<>(Instruction::Adc, Register::Spl, Immediate(5));
 		std::cout << chunk;
 	}
 	catch (const std::exception& ex)
