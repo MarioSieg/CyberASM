@@ -10,14 +10,35 @@
 namespace CyberAsm::X86
 {
 	template <Abi Arch = Abi::X86_64>
-	[[nodiscard]] constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& operand) -> ByteChunk
+	[[nodiscard]]
+	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& immediate) -> ByteChunk
 	{
-		const auto variation = AutoLookupInstruction(instruction, reg, operand).value();
+		const auto registerSize = LookupRegisterSize(reg);
+		auto immediateSize = ComputeRequiredBytes(immediate.UValue);
+
+		if (immediateSize < registerSize) [[likely]]
+		{
+			// Extend to 32 bit size (only mov allows imm64)
+			// TODO: Check if instruction is mov!
+			immediateSize = registerSize == WordSize::QWord ? WordSize::DWord : registerSize;
+		}
+		else if (immediateSize > registerSize) [[unlikely]]
+		{
+			throw std::runtime_error("Immediate value is too large for destination register!");
+		}
+
+		const auto variationOpt = AutoLookupInstruction(instruction, reg, immediateSize);
+		if (!variationOpt) [[unlikely]]
+		{
+			throw std::runtime_error("Found no corresponding instruction for operand types!");
+		}
+
+		const auto variation = *variationOpt;
 
 		ByteChunk result = {};
 
-		const auto isAnyOperand64Bit = IsMin64BitRegister(reg) || Is64BitOrLarger(ComputeRequiredBytes(operand.UValue));
-		
+		const auto isAnyOperand64Bit = IsMin64BitRegister(reg) || Is64BitOrLarger(immediateSize);
+
 		// Using 64-bit operand size and the instruction does not default to 64-bit operand size?
 		auto requiresRex = isAnyOperand64Bit;
 
@@ -68,7 +89,7 @@ namespace CyberAsm::X86
 		// None
 
 		// Immediate:
-		result << operand;
+		result.WriteFixedImmediate(immediate, immediateSize);
 
 		return result;
 	}

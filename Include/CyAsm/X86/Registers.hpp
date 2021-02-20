@@ -55,6 +55,46 @@ namespace CyberAsm::X86
 		Sp,
 		Spl,
 
+		R8,
+		R8D,
+		R8W,
+		R8B,
+
+		R9,
+		R9D,
+		R9W,
+		R9B,
+
+		R10,
+		R10D,
+		R10W,
+		R10B,
+
+		R11,
+		R11D,
+		R11W,
+		R11B,
+
+		R12,
+		R12D,
+		R12W,
+		R12B,
+
+		R13,
+		R13D,
+		R13W,
+		R13B,
+
+		R14,
+		R14D,
+		R14W,
+		R14B,
+
+		R15,
+		R15D,
+		R15W,
+		R15B,
+
 		Rip,
 		Eip,
 		Ip,
@@ -129,9 +169,17 @@ namespace CyberAsm::X86
 		#include "RegisterIdTable.inl"
 	};
 
-	[[nodiscard]] constexpr auto LookupRegisterId(const Register reg) -> std::uint8_t
+	[[nodiscard]]
+	constexpr auto LookupRegisterId(const Register reg) -> std::uint8_t
 	{
 		return RegisterIdTable[static_cast<std::size_t>(reg)];
+	}
+
+
+	[[nodiscard]]
+	constexpr auto LookupRegisterSize(const Register reg) -> WordSize
+	{
+		return RegisterSizeTable[static_cast<std::size_t>(reg)];
 	}
 
 	/// <summary>
@@ -139,6 +187,7 @@ namespace CyberAsm::X86
 	/// </summary>
 	/// <param name="reg">The target register.</param>
 	/// <returns>True if the register is an implicit accumulator GPR.</returns>
+	[[nodiscard]]
 	constexpr auto IsAccumulator(const Register reg) noexcept -> bool
 	{
 		return reg == Register::Al || reg == Register::Ax || reg == Register::Eax || reg == Register::Rax;
@@ -149,6 +198,7 @@ namespace CyberAsm::X86
 	/// </summary>
 	/// <param name="reg">The target register.</param>
 	/// <returns>True if the register is a high-byte such as ah, bh, ch and dh.</returns>
+	[[nodiscard]]
 	constexpr auto IsHighByteRegister(const Register reg) noexcept -> bool
 	{
 		return reg == Register::Ah || reg == Register::Bh || reg == Register::Ch || reg == Register::Dh;
@@ -159,6 +209,7 @@ namespace CyberAsm::X86
 	/// </summary>
 	/// <param name="reg">The target register.</param>
 	/// <returns>True if the register is a uniform high register such as spl, bpl, sil or dil, else false.</returns>
+	[[nodiscard]]
 	constexpr auto IsUniformByteRegister(const Register reg) noexcept -> bool
 	{
 		return reg == Register::Spl || reg == Register::Bpl || reg == Register::Sil || reg == Register::Dil;
@@ -169,6 +220,7 @@ namespace CyberAsm::X86
 	/// </summary>
 	/// <param name="reg"></param>
 	/// <returns></returns>
+	[[nodiscard]]
 	constexpr auto IsMin64BitRegister(const Register reg) noexcept -> bool
 	{
 		return Is64BitOrLarger(RegisterSizeTable[static_cast<std::size_t>(reg)]);
@@ -180,10 +232,15 @@ namespace CyberAsm::X86
 	/// </summary>
 	/// <param name="reg"></param>
 	/// <returns></returns>
+	[[nodiscard]]
 	constexpr auto IsExtendedRegister(const Register reg) noexcept -> bool
 	{
-		(void)reg;
-		// TODO
-		return false;
+		const auto val = static_cast<std::size_t>(reg);
+		return
+			(val >= static_cast<std::size_t>(Register::R8) &&
+			val <= static_cast<std::size_t>(Register::R15B))
+			||
+			(val >= static_cast<std::size_t>(Register::Xmm0) &&
+			val <= static_cast<std::size_t>(Register::Xmm15));
 	}
 }

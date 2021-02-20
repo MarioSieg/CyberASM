@@ -57,7 +57,20 @@ namespace CyberAsm
 
 	constexpr auto Is64BitOrLarger(const WordSize size) noexcept -> bool
 	{
-		return static_cast<std::uint8_t>(size) >= static_cast<std::uint8_t>(WordSize::QWord);
+		return static_cast<std::underlying_type_t<WordSize>>(size) >= static_cast<std::underlying_type_t<WordSize>>(WordSize::QWord);
+	}
+
+	constexpr auto RoundUpToNextPowerOf2(const WordSize size) noexcept -> WordSize
+	{
+		auto bytes = static_cast<std::uint32_t>(size);
+		--bytes;
+		bytes |= bytes >> 1U;
+		bytes |= bytes >> 2U;
+		bytes |= bytes >> 4U;
+		bytes |= bytes >> 8U;
+		bytes |= bytes >> 16U;
+		bytes = std::clamp<std::uint8_t>(static_cast<std::uint8_t>(++bytes), 1, static_cast<std::uint8_t>(WordSize::QOWord));
+		return static_cast<WordSize>(bytes);
 	}
 
 	template <typename... T>

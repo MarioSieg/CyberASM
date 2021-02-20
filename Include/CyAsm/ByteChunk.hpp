@@ -43,6 +43,7 @@ namespace CyberAsm
 		[[nodiscard]] constexpr auto ChunkBuffer() const noexcept -> const Buffer&;
 		constexpr void Clear() noexcept;
 		constexpr void Fill(std::uint8_t value) noexcept;
+		constexpr void WriteFixedImmediate(const Immediate& imm, const WordSize fixed);
 
 		constexpr auto operator <<(std::uint8_t value) noexcept -> ByteChunk&;
 		constexpr auto operator <<(std::byte value) noexcept -> ByteChunk&;
@@ -120,6 +121,14 @@ namespace CyberAsm
 		this->chunkBuffer.fill(value);
 	}
 
+	constexpr void ByteChunk::WriteFixedImmediate(const Immediate& imm, const WordSize fixed)
+	{
+		for (std::uint8_t i = 0; i < static_cast<std::underlying_type_t<WordSize>>(fixed); ++i)
+		{
+			*this << imm.Bytes[i];
+		}
+	}
+
 	constexpr auto ByteChunk::operator<<(const std::uint8_t value) noexcept -> ByteChunk&
 	{
 		return this->PushBack(value);
@@ -137,7 +146,7 @@ namespace CyberAsm
 
 	constexpr auto ByteChunk::operator<<(const Immediate& imm) noexcept -> ByteChunk&
 	{
-		for (std::uint8_t i = 0; i < static_cast<std::uint8_t>(ComputeRequiredBytes(imm.UValue)); ++i)
+		for (std::uint8_t i = 0; i < static_cast<std::underlying_type_t<WordSize>>(ComputeRequiredBytes(imm.UValue)); ++i)
 		{
 			*this << imm.Bytes[i];
 		}

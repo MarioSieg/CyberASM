@@ -39,8 +39,20 @@ namespace CyberAsm
 		return EndianSwapImpl<U>(x, std::make_index_sequence<sizeof(T)>{});
 	}
 
+	/// <summary>
+	/// Calculate the minimal storage size in bytes a value would need.
+	/// Useful to calculate the required storage for immediate values:
+	/// mov rax, 0xFF <- Result = 1
+	/// mov rax, 0xFFFF <- Result = 2
+	/// mov rax, 0xFFFF'FFFF <- Result = 4
+	/// mov rax, 0xFFFFFFFF'FFFFFFFF <- Result = 8
+	/// etc..
+	/// </summary>
+	/// <param name="value">The value to check. </param>
+	/// <returns></returns>
 	constexpr auto ComputeRequiredBytes(std::uint64_t value) noexcept -> WordSize
 	{
+		// Count required bytes:
 		std::uint8_t bytes = 0;
 		do
 		{
@@ -48,7 +60,9 @@ namespace CyberAsm
 			++bytes;
 		}
 		while (value);
-		return static_cast<WordSize>(bytes);
+
+		// Round up to next power of 2:
+		return RoundUpToNextPowerOf2(static_cast<WordSize>(bytes));
 	}
 
 	/// <summary>

@@ -42,6 +42,46 @@ WordSize::DWord, // esp
 WordSize::Word,  // sp
 WordSize::HWord, // spl
 
+WordSize::QWord, // r8
+WordSize::DWord, // r8d
+WordSize::Word,  // r8w
+WordSize::HWord, // r8b
+
+WordSize::QWord, // r9
+WordSize::DWord, // r9d
+WordSize::Word,  // r9w
+WordSize::HWord, // r9b
+
+WordSize::QWord, // r10
+WordSize::DWord, // r10d
+WordSize::Word,  // r10w
+WordSize::HWord, // r10b
+
+WordSize::QWord, // r11
+WordSize::DWord, // r11d
+WordSize::Word,  // r11w
+WordSize::HWord, // r11b
+
+WordSize::QWord, // r12
+WordSize::DWord, // r12d
+WordSize::Word,  // r12w
+WordSize::HWord, // r12b
+
+WordSize::QWord, // r13
+WordSize::DWord, // r13d
+WordSize::Word,  // r13w
+WordSize::HWord, // r13b
+
+WordSize::QWord, // r14
+WordSize::DWord, // r14d
+WordSize::Word,  // r14w
+WordSize::HWord, // r14b
+
+WordSize::QWord, // r15
+WordSize::DWord, // r15d
+WordSize::Word,  // r15w
+WordSize::HWord, // r15b
+
 WordSize::QWord, // rip
 WordSize::DWord, // eip
 WordSize::Word,  // ip

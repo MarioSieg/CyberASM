@@ -144,17 +144,42 @@ static void RunAllTestsForX86()
 		assert(machineCode[3] == 0x05);
 		static_cast<void>(machineCode);
 	}
+
+	// adc rax, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Rax, Immediate(0xFF));
+		assert(machineCode.Size() == 6);
+		assert(machineCode[0] == 0x48);
+		assert(machineCode[1] == 0x15);
+		assert(machineCode[2] == 0xFF);
+		assert(machineCode[3] == 0x00);
+		assert(machineCode[4] == 0x00);
+		assert(machineCode[5] == 0x00);
+		static_cast<void>(machineCode);
+	}
 }
 
 auto main(const int argc, const char* const* const argv) -> int
 {
-	static_cast<void>(argc);
-	static_cast<void>(argv);
-	std::cout << "Running CyberAsm tests...\n";
+	try
+	{
+		static_cast<void>(argc);
+		static_cast<void>(argv);
+		std::cout << "Running CyberAsm tests...\n";
 
-	RunAllTestsForX86();
+		RunAllTestsForX86();
 
-	std::cout << "All tests ok!" << std::endl;
+		std::cout << "All tests ok!" << std::endl;
 
-	return 0;
+		return 0;
+	}
+	catch (const std::exception& ex)
+	{
+		std::cerr << ex.what() << std::endl;
+		return -1;
+	}
+	catch (...)
+	{
+		return -1;
+	}
 }

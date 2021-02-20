@@ -21,6 +21,18 @@ namespace CyberAsm::X86::Mapper
 		}
 	}
 
+	constexpr auto MapFlags(const WordSize immSize) -> OperandFlags::Flags
+	{
+		switch (immSize)
+		{
+				[[unlikely]] case WordSize::HWord: return OperandFlags::Imm8;
+				[[unlikely]] case WordSize::Word: return OperandFlags::Imm16;
+				[[likely]] case WordSize::DWord: return OperandFlags::Imm32;
+				[[likely]] case WordSize::QWord: return OperandFlags::Imm64;
+				[[unlikely]] default: throw std::runtime_error("not implemented");
+		}
+	}
+
 	constexpr auto MapFlags(const Register register_) -> OperandFlags::Flags
 	{
 		// @formatter:off
