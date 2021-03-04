@@ -15,7 +15,7 @@ auto main(const int argc, const char* const* const argv) -> int
 
 		using namespace X86;
 
-		const ByteChunk chunk = Cas2Encode<>(Instruction::Adc, Register::Spl, Immediate(5));
+		const ByteChunk chunk = Cas2Encode<>(Instruction::Adc, Register::Rax, Immediate(5));
 		std::cout << chunk;
 		return 0;
 	}

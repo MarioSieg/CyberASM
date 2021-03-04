@@ -53,8 +53,7 @@ namespace CyberAsm::X86
 	/// <returns></returns>
 	constexpr auto PackByteRexPrefix(const bool w, const bool r = false, const bool x = false, const bool b = false) noexcept -> std::uint8_t
 	{
-		std::uint8_t rex = 0b0000'0100U;
-		rex <<= 4U;
+		std::uint8_t rex = 0b0100'0000U;
 		rex ^= (-static_cast<std::uint8_t>(b) ^ rex) & 1U << 0U;
 		rex ^= (-static_cast<std::uint8_t>(x) ^ rex) & 1U << 1U;
 		rex ^= (-static_cast<std::uint8_t>(r) ^ rex) & 1U << 2U;

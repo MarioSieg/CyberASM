@@ -175,7 +175,6 @@ namespace CyberAsm::X86
 		return RegisterIdTable[static_cast<std::size_t>(reg)];
 	}
 
-
 	[[nodiscard]]
 	constexpr auto LookupRegisterSize(const Register reg) -> WordSize
 	{

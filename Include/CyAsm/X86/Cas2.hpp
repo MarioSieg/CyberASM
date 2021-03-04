@@ -13,8 +13,8 @@ namespace CyberAsm::X86
 	[[nodiscard]]
 	constexpr auto Cas2Encode(const Instruction instruction, const Register reg, const Immediate& immediate) -> ByteChunk
 	{
-		const auto registerSize = LookupRegisterSize(reg);
-		auto immediateSize = ComputeRequiredBytes(immediate.UValue);
+		const WordSize registerSize = LookupRegisterSize(reg);
+		WordSize immediateSize = ComputeRequiredBytes(immediate.UValue);
 
 		if (immediateSize < registerSize) [[likely]]
 		{
@@ -26,21 +26,21 @@ namespace CyberAsm::X86
 		{
 			throw std::runtime_error("Immediate value is too large for destination register!");
 		}
-
-		const auto variationOpt = AutoLookupInstruction(instruction, reg, immediateSize);
+		
+		const std::optional<std::size_t> variationOpt = AutoLookupInstruction(instruction, reg, immediateSize);
 		if (!variationOpt) [[unlikely]]
 		{
 			throw std::runtime_error("Found no corresponding instruction for operand types!");
 		}
 
-		const auto variation = *variationOpt;
+		const std::size_t variation = *variationOpt;
 
 		ByteChunk result = {};
 
-		const auto isAnyOperand64Bit = IsMin64BitRegister(reg) || Is64BitOrLarger(immediateSize);
+		const bool isAnyOperand64Bit = IsMin64BitRegister(reg) || Is64BitOrLarger(immediateSize);
 
 		// Using 64-bit operand size and the instruction does not default to 64-bit operand size?
-		auto requiresRex = isAnyOperand64Bit;
+		bool requiresRex = isAnyOperand64Bit;
 
 		// Using one of the extended registers (R8 to R15, XMM8 to XMM15, YMM8 to YMM15, CR8 to CR15 and DR8 to DR15)?
 		requiresRex |= IsExtendedRegister(reg);

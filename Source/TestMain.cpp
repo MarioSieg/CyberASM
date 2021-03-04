@@ -10,7 +10,7 @@ static void RunAllTestsForX86()
 	using namespace X86;
 
 	// Test instruction lookup:
-
+#if 0
 	{
 		const auto instruction = LookupOptimalInstructionVariation<OperandFlags::Reg64, OperandFlags::Imm32>(Instruction::Adc);
 		assert(instruction);
@@ -155,6 +155,83 @@ static void RunAllTestsForX86()
 		assert(machineCode[3] == 0x00);
 		assert(machineCode[4] == 0x00);
 		assert(machineCode[5] == 0x00);
+		static_cast<void>(machineCode);
+	}
+
+	// adc rax, 0xFFF
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Rax, Immediate(0xFFF));
+		assert(machineCode.Size() == 6);
+		assert(machineCode[0] == 0x48);
+		assert(machineCode[1] == 0x15);
+		assert(machineCode[2] == 0xFF);
+		assert(machineCode[3] == 0x0F);
+		assert(machineCode[4] == 0x00);
+		assert(machineCode[5] == 0x00);
+		static_cast<void>(machineCode);
+	}
+
+	// adc eax, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Eax, Immediate(5));
+		assert(machineCode.Size() == 5);
+		assert(machineCode[0] == 0x15);
+		assert(machineCode[1] == 0x05);
+		assert(machineCode[2] == 0x00);
+		assert(machineCode[3] == 0x00);
+		assert(machineCode[4] == 0x00);
+		static_cast<void>(machineCode);
+	}
+
+	// adc esi, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Esi, Immediate(5));
+		assert(machineCode.Size() == 6);
+		assert(machineCode[0] == 0x81);
+		assert(machineCode[1] == 0xD6);
+		assert(machineCode[2] == 0x05);
+		assert(machineCode[3] == 0x00);
+		assert(machineCode[4] == 0x00);
+		assert(machineCode[5] == 0x00);
+		static_cast<void>(machineCode);
+	}
+
+	// adc esp, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Esp, Immediate(5));
+		assert(machineCode.Size() == 6);
+		assert(machineCode[0] == 0x81);
+		assert(machineCode[1] == 0xD4);
+		assert(machineCode[2] == 0x05);
+		assert(machineCode[3] == 0x00);
+		assert(machineCode[4] == 0x00);
+		assert(machineCode[5] == 0x00);
+		static_cast<void>(machineCode);
+	}
+
+	// adc ebp, 5
+	{
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Ebp, Immediate(5));
+		assert(machineCode.Size() == 6);
+		assert(machineCode[0] == 0x81);
+		assert(machineCode[1] == 0xD5);
+		assert(machineCode[2] == 0x05);
+		assert(machineCode[3] == 0x00);
+		assert(machineCode[4] == 0x00);
+		assert(machineCode[5] == 0x00);
+		static_cast<void>(machineCode);
+	}
+
+#endif
+	// adc ax, 5
+	{
+		// TODO operand override
+		const auto machineCode = Cas2Encode<>(Instruction::Adc, Register::Ax, Immediate(5));
+		assert(machineCode.Size() == 4);
+		assert(machineCode[0] == 0x66);
+		assert(machineCode[1] == 0x15);
+		assert(machineCode[2] == 0x05);
+		assert(machineCode[3] == 0x00);
 		static_cast<void>(machineCode);
 	}
 }

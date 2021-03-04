@@ -139,10 +139,10 @@ namespace CyberAsm
 	inline MachineStream<Arch>::MachineStream() noexcept = default;
 
 	template <Abi Arch>
-	MachineStream<Arch>::MachineStream(StreamBuffer&& vector) noexcept : stream(std::move(vector)) { }
+	inline MachineStream<Arch>::MachineStream(StreamBuffer&& vector) noexcept : stream(std::move(vector)) { }
 
 	template <Abi Arch>
-	MachineStream<Arch>::MachineStream(const std::vector<std::byte>& vector)
+	inline MachineStream<Arch>::MachineStream(const std::vector<std::byte>& vector)
 	{
 		this->stream.reserve(vector.size());
 		for (const auto value : vector)

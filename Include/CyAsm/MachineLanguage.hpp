@@ -16,25 +16,25 @@ namespace CyberAsm
 		ARM_64
 	};
 
-	constexpr auto operator""_mach(const char8_t* const str, const std::size_t count) -> std::u8string_view
+	constexpr auto operator""_mach(const char8_t* const str, const std::size_t count) noexcept -> std::u8string_view
 	{
 		return {str, count};
 	}
 
 	template <typename... T>
-	[[nodiscard]] constexpr auto VariadicArrayConstruct(T&&... values) -> decltype(auto)
+	[[nodiscard]] constexpr auto VaridadicArrayConstruct(T&&... values) noexcept -> decltype(auto)
 	{
 		return std::array<std::decay_t<std::common_type_t<T...>>, sizeof...(T)>{std::forward(values)...};
 	}
 
 	template <typename T, std::size_t... N>
-	[[nodiscard]] constexpr auto EndianSwapImpl(T&& x, std::index_sequence<N...>) -> T
+	[[nodiscard]] constexpr auto EndianSwapImpl(T&& x, std::index_sequence<N...>) noexcept -> T
 	{
-		return (((x >> N * CHAR_BIT & 0xFF) << (sizeof(T) - N - 1U) * CHAR_BIT) | ...);
+		return (((x >> N * CHAR_BIT & 0xFFU) << (sizeof(T) - N - 1U) * CHAR_BIT) | ...);
 	}
 
 	template <typename T, typename U = std::make_unsigned_t<T>>
-	[[nodiscard]] constexpr auto EndianSwap(T&& x) -> U
+	[[nodiscard]] constexpr auto EndianSwap(T&& x) noexcept -> U
 	{
 		return EndianSwapImpl<U>(x, std::make_index_sequence<sizeof(T)>{});
 	}
